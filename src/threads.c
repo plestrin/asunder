@@ -51,6 +51,10 @@ static double aac_percent;
 static unsigned int rip_tracks_completed;
 static unsigned int encode_tracks_completed;
 
+static gpointer encode(gpointer data);
+static gpointer rip(gpointer data);
+static gpointer track(gpointer data);
+
 // aborts ripping- stops all the threads and return to normal execution
 void abort_threads(void){
 	aborted = true;
@@ -439,7 +443,7 @@ void dorip(void){
 	tracker = g_thread_new(NULL, track, NULL);
 }
 
-gpointer rip(gpointer data){
+static gpointer rip(gpointer data){
 	const struct albumMeta* album_meta = (const struct albumMeta*)data;
 	struct trackMeta*	   cursor;
 
@@ -503,7 +507,7 @@ gpointer rip(gpointer data){
 		} 																									\
 	}
 
-gpointer encode(gpointer data){
+static gpointer encode(gpointer data){
 	struct albumMeta* 	album_meta = (struct albumMeta*)data;
 	struct trackMeta* 	cursor;
 	char				file_name[PATH_MAX];
@@ -721,7 +725,7 @@ gpointer encode(gpointer data){
 	return NULL;
 }
 
-gpointer track(gpointer data){
+static gpointer track(gpointer data){
 	int parts = 1;
 	if (global_prefs->rip_mp3)
 		parts++;

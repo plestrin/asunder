@@ -1,15 +1,3 @@
-/*
-Asunder
-
-Copyright(C) 2005 Eric Lathrop <eric@ericlathrop.com>
-Copyright(C) 2007 Andrew Smith <http://littlesvr.ca/misc/contactandrew.php>
-
-Any code in this file may be redistributed or modified under the terms of
-the GNU General Public Licence as published by the Free Software
-Foundation; version 2 of the licence.
-
-*/
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,10 +15,9 @@ Foundation; version 2 of the licence.
 #include "support.h"
 #include "prefs.h"
 
-void fatalError(const char* message)
-{
+void fatalError(const char* message){
     fprintf(stderr, "Fatal error: %s\n", message);
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
 
 int int_to_monkey_int(int i)
@@ -568,58 +555,38 @@ int recursive_parent_mkdir(char* pathAndName, mode_t mode)
     return rc;
 }
 
-// removes all instances of bad characters from the string
-//
-// str - the string to trim
-// bad - the sting containing all the characters to remove
-void trim_chars(char * str, const char * bad)
-{
-    int i;
-    int pos;
-    int len = strlen(str);
-    unsigned b;
+void trim_chars(char* str, const char* bad){
+    size_t i;
+    size_t j;
+    size_t k;
 
-    for (b=0; b<strlen(bad); b++)
-    {
-        pos = 0;
-        for (i=0; i<len+1; i++)
-        {
-            if (str[i] != bad[b])
-            {
-                str[pos] = str[i];
-                pos++;
+    for (j = 0; bad[j]; j ++){
+        for (i = 0, k = 0; str[i]; i ++){
+            if (str[i] != bad[j]){
+                str[k ++] = str[i];
             }
         }
+        str[k] = 0;
     }
 }
 
-// removes leading and trailing whitespace as defined by isspace()
-//
-// str - the string to trim
-void trim_whitespace(char * str)
-{
-    int i;
-    int pos = 0;
-    int len = strlen(str);
+void trim_whitespace(char* str){
+    size_t i;
+    size_t j;
 
-    // trim leading space
-    for (i=0; i<len+1; i++)
-    {
-        if (!isspace(str[i]) || (pos > 0))
-        {
-            str[pos] = str[i];
-            pos++;
+    for (i = 0, j = 0; str[i]; i ++){
+        if (!isspace(str[i]) || j){
+            str[j ++] = str[i];
         }
     }
 
-    // trim trailing space
-    len = strlen(str);
-    for (i=len-1; i>=0; i--)
-    {
-        if (!isspace(str[i]))
-        {
+    str[j] = 0;
+
+    for (; j; ){
+        j --;
+        if (!isspace(str[j])){
             break;
         }
-        str[i] = '\0';
+        str[j] = 0;
     }
 }

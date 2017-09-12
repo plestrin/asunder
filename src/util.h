@@ -3,7 +3,7 @@
 
 #define debugLog(...) if (global_prefs->do_log){syslog(LOG_USER|LOG_INFO, __VA_ARGS__);}
 
-void fatalError(const char* message);
+void fatalError(const char* message) __attribute__ ((noreturn));
 
 int int_to_monkey_int(int i);
 int int_to_vbr_int(int i);
@@ -52,16 +52,8 @@ int recursive_parent_mkdir(char* pathAndName, mode_t mode);
 // returns 1 if found, 0 otherwise
 int program_exists(const char * name);
 
-// removes leading and trailing whitespace as defined by isspace()
-//
-// str - the string to trim
-void trim_whitespace(char * str);
-
-// removes all instances of bad characters from the string
-//
-// str - the string to trim
-// bad - the sting containing all the characters to remove
-void trim_chars(char * str, const char * bad);
+void trim_chars(char* str, const char* bad);
+void trim_whitespace(char* str);
 
 // LNR - It's possible that some files may end up on a MS file system,
 // so it's best to disallow MS invalid chars as well. I also disallow

@@ -22,11 +22,10 @@
 
 struct prefs* global_prefs;
 
-static struct prefs * new_prefs(void){
+static struct prefs* new_prefs(void){
     struct prefs* p;
 
-    if ((p = calloc(1, sizeof(struct prefs))) == NULL)
-    {
+    if ((p = calloc(1, sizeof(struct prefs))) == NULL){
         fatalError("calloc() failed. Out of memory.");
     }
 

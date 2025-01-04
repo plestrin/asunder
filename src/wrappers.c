@@ -14,10 +14,8 @@ Foundation; version 2 of the licence.
 
 #include <sys/types.h>
 #include <unistd.h>
-#include <gtk/gtk.h>
 #include <stdio.h>
 #include <signal.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -236,19 +234,12 @@ int exec_with_output(const char * args[], int toread, pid_t * p)
         // close the side of the pipe we don't need
         close(pipefd[0]);
 
-        /* this causes a segfault on fedora, and I don't really see why it's needed anyway */
-        //~ // close all standard streams to keep output clean
-        //~ close(STDOUT_FILENO);
-        //~ close(STDIN_FILENO);
-        //~ close(STDERR_FILENO);
-
-        /* instead redirect to /dev/null */
         if (gbl_null_fd != -1)
         {
-            dup2(STDOUT_FILENO, gbl_null_fd);
-            close(STDOUT_FILENO);
-            dup2(STDERR_FILENO, gbl_null_fd);
-            close(STDERR_FILENO);
+            dup2(gbl_null_fd, STDIN_FILENO);
+            dup2(gbl_null_fd, STDOUT_FILENO);
+            dup2(gbl_null_fd, STDERR_FILENO);
+            close(gbl_null_fd);
         }
 
         // setup output

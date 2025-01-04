@@ -60,7 +60,7 @@ int numAacOk;
 int numchildren = 0;
 static bool waitBeforeSigchld;
 
-void blockSigChld(void)
+static void blockSigChld(void)
 {
     sigset_t block_chld;
 
@@ -73,7 +73,7 @@ void blockSigChld(void)
     waitBeforeSigchld = true;
 }
 
-void unblockSigChld(void)
+static void unblockSigChld(void)
 {
     sigset_t block_chld;
 
@@ -216,7 +216,7 @@ void sigchld(int signum)
 // p - a place to write the PID of the exec'ed process
 //
 // returns - a file descriptor that reads whatever the program outputs on "toread"
-int exec_with_output(const char * args[], int toread, pid_t * p)
+static int exec_with_output(const char * args[], int toread, pid_t * p)
 {
     char logStr[1024];
     int pipefd[2];

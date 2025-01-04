@@ -1,19 +1,13 @@
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <limits.h>
 #include <ctype.h>
 #include <errno.h>
-#include <gtk/gtk.h>
-#include <stdarg.h>
 
 #include "util.h"
-#include "main.h"
-#include "support.h"
-#include "prefs.h"
 
 void fatalError(const char* message){
     fprintf(stderr, "Fatal error: %s\n", message);

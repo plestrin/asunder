@@ -85,16 +85,6 @@ static void unblockSigChld(void)
     waitBeforeSigchld = false;
 }
 
-extern pid_t cdparanoia_pid;
-extern pid_t lame_pid;
-extern pid_t oggenc_pid;
-extern pid_t opusenc_pid;
-extern pid_t flac_pid;
-extern pid_t wavpack_pid;
-extern pid_t monkey_pid;
-extern pid_t musepack_pid;
-extern pid_t aac_pid;
-
 // Signal handler to find out when our child has exited.
 // Do not pot any printf or syslog into here, it causes a deadlock.
 //

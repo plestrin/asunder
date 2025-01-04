@@ -328,15 +328,13 @@ static GList * gbl_matches = NULL;
 
 gpointer cddb_query_thread_run(gpointer data)
 {
-    char logStr[1024];
     int i;
 
     gbl_cddb_query_thread_num_matches = cddb_query(gbl_cddb_query_thread_conn, gbl_cddb_query_thread_disc);
     if (gbl_cddb_query_thread_num_matches == -1)
         gbl_cddb_query_thread_num_matches = 0;
 
-    snprintf(logStr, 1024, "Found %d CDDB matches", gbl_cddb_query_thread_num_matches);
-    debugLog(logStr);
+    debugLog("found %d CDDB matches\n", gbl_cddb_query_thread_num_matches)
 
     gbl_matches = NULL;
 
@@ -420,7 +418,6 @@ GList * lookup_disc(cddb_disc_t * disc)
 // so we can send it over the internet to lookup the disc
 cddb_disc_t * read_disc(char * cdrom)
 {
-    char logStr[1024];
     int fd;
     int status;
     int i;
@@ -466,8 +463,7 @@ cddb_disc_t * read_disc(char * cdrom)
         // see if we can read the disc's table of contents (TOC).
         if (ioctl(fd, CDIOREADTOCHEADER, &th) == 0)
         {
-            snprintf(logStr, 1024, "starting track: %d, ending track: %d\n", th.starting_track, th.ending_track);
-            debugLog(logStr);
+            debugLog("starting track: %d, ending track: %d\n", th.starting_track, th.ending_track)
 
             disc = cddb_disc_new();
             if (disc == NULL)
@@ -518,8 +514,7 @@ cddb_disc_t * read_disc(char * cdrom)
         // see if we can read the disc's table of contents (TOC).
         if (ioctl(fd, CDIOREADTOCHEADER, &th) == 0)
         {
-            snprintf(logStr, 1024, "starting track: %d, ending track: %d\n", th.starting_track, th.ending_track);
-            debugLog(logStr);
+            debugLog("starting track: %d, ending track: %d\n", th.starting_track, th.ending_track)
 
             disc = cddb_disc_new();
             if (disc == NULL)
@@ -567,8 +562,7 @@ cddb_disc_t * read_disc(char * cdrom)
         // see if we can read the disc's table of contents (TOC).
         if (ioctl(fd, CDROMREADTOCHDR, &th) == 0)
         {
-            snprintf(logStr, 1024, "starting track: %d, ending track: %d\n", th.cdth_trk0, th.cdth_trk1);
-            debugLog(logStr);
+            debugLog("starting track: %d, ending track: %d\n", th.cdth_trk0, th.cdth_trk1)
 
             disc = cddb_disc_new();
             if (disc == NULL)

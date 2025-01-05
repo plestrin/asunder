@@ -17,7 +17,7 @@
 
 #define DEFAULT_PROXY               "10.0.0.1"
 #define DEFAULT_PROXY_PORT          8080
-#define DEFAULT_CDDB_SERVER         "freedb.freedb.org"
+#define DEFAULT_CDDB_SERVER         "gnudb.gnudb.org"
 #define DEFAULT_CDDB_SERVER_PORT    8880
 
 struct prefs* global_prefs;

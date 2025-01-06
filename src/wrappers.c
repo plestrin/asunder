@@ -807,14 +807,14 @@ void wavpack_enc(int tracknum, char* artist, char* album, char* title, char* yea
     int pos;
     int size;
     char buf[256];
+    char bitrateTxt[7];
 
     pos = 0;
     args[pos++] = "wavpack";
 
     if (hybrid)
     {
-        char bitrateTxt[7];
-        snprintf(bitrateTxt, 7, "-b%d", bitrate);
+        snprintf(bitrateTxt, sizeof bitrateTxt, "-b%d", bitrate);
         args[pos++] = bitrateTxt;
 
         args[pos++] = "-c";

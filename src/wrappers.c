@@ -221,20 +221,23 @@ static int exec_with_output(const char * args[], int toread, pid_t * p)
         // im the child
         // i get to execute the command
 
-        // close the side of the pipe we don't need
-        close(pipefd[0]);
-
         if (gbl_null_fd != -1)
         {
             dup2(gbl_null_fd, STDIN_FILENO);
             dup2(gbl_null_fd, STDOUT_FILENO);
             dup2(gbl_null_fd, STDERR_FILENO);
-            close(gbl_null_fd);
         }
 
         // setup output
         dup2(pipefd[1], toread);
-        close(pipefd[1]);
+
+        // close all other file descriptor
+        int fdlimit = (int)sysconf(_SC_OPEN_MAX);
+        for (int i = 0; i < fdlimit; i++) {
+            if (i != STDIN_FILENO && i != STDOUT_FILENO && i != STDERR_FILENO) {
+                close(i);
+            }
+        }
 
         // call execvp
         execvp(args[0], (char **)args);

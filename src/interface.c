@@ -1095,7 +1095,7 @@ create_prefs (void)
     gtk_box_pack_start (GTK_BOX (hbox), portNum, TRUE, TRUE, 5);
     GLADE_HOOKUP_OBJECT (prefs, portNum, "port_number");
 
-    do_log = gtk_check_button_new_with_label (_("Log to /var/log/asunder.log"));
+    do_log = gtk_check_button_new_with_label (_("Enable log"));
     gtk_widget_show (do_log);
     gtk_box_pack_start (GTK_BOX (vbox), do_log, FALSE, FALSE, 0);
     GLADE_HOOKUP_OBJECT (prefs, do_log, "do_log");

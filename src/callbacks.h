@@ -20,10 +20,6 @@ format_wavpack_bitrate                 (GtkScale *scale,
 
 gboolean idle(gpointer data);
 
-void
-on_aboutbox_response                   (GtkDialog       *dialog,
-                                        gint             response_id,
-                                        gpointer         user_data);
 
 gboolean
 on_album_artist_focus_out_event        (GtkWidget       *widget,
@@ -66,10 +62,6 @@ on_browse_clicked                      (GtkButton       *button,
 void
 on_cancel_clicked                      (GtkButton       *button,
                                         gpointer         user_data);
-
-//~ void
-//~ on_cddb_update_close_clicked          (GtkButton       *button,
-                                       //~ GtkWidget**      update_window);
 
 gboolean
 on_cddb_update_closed         (GtkWidget *widget,

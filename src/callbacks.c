@@ -64,15 +64,6 @@ idle(gpointer data)
     return (data != NULL);
 }
 
-void
-on_aboutbox_response                   (GtkDialog       *dialog,
-                                        gint             response_id,
-                                        gpointer         user_data)
-{
-    gtk_widget_hide(GTK_WIDGET(dialog));
-    gtk_widget_destroy(GTK_WIDGET(dialog));
-}
-
 gboolean
 on_album_artist_focus_out_event        (GtkWidget       *widget,
                                         GdkEventFocus   *event,

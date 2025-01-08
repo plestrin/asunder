@@ -204,16 +204,6 @@ on_cancel_clicked                      (GtkButton       *button,
     abort_threads();
 }
 
-gboolean
-on_cddb_update_closed         (GtkWidget *widget,
-                               GdkEvent  *event,
-                               GtkWidget**      update_window)
-{
-    *update_window = NULL;
-
-    return FALSE;
-}
-
 void
 on_deselect_all_click                  (GtkMenuItem *menuitem,
                                         gpointer data)

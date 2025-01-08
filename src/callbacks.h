@@ -63,11 +63,6 @@ void
 on_cancel_clicked                      (GtkButton       *button,
                                         gpointer         user_data);
 
-gboolean
-on_cddb_update_closed         (GtkWidget *widget,
-                               GdkEvent  *event,
-                               GtkWidget**      update_window);
-
 void
 on_deselect_all_click                  (GtkMenuItem *menuitem,
                                         gpointer data);

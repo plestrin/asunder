@@ -92,22 +92,14 @@ on_year_focus_out_event        (GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data)
 {
-    const gchar * ctext = gtk_entry_get_text(GTK_ENTRY(widget));
-    gchar * text = malloc(5);
-    if (text == NULL)
-        fatalError("malloc(5) failed. Out of memory.");
-    strncpy(text, ctext, 5);
-    text[4] = '\0';
+    const gchar *ctext = gtk_entry_get_text(GTK_ENTRY(widget));
 
-    if ((text[0] != '1' && text[0] != '2') || text[1] < '0' || text[1] > '9' ||
-        text[2] < '0' || text[2] > '9' || text[3] < '0' || text[3] > '9')
+    if (strlen(ctext) != 4 || (ctext[0] != '1' && ctext[0] != '2') || ctext[1] < '0' || ctext[1] > '9' ||
+        ctext[2] < '0' || ctext[2] > '9' || ctext[3] < '0' || ctext[3] > '9')
     {
-        sprintf(text, "1900");
+        gtk_entry_set_text(GTK_ENTRY(widget), "1900");
     }
 
-    gtk_entry_set_text(GTK_ENTRY(widget), text);
-
-    free(text);
     return FALSE;
 }
 

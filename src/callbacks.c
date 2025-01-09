@@ -660,7 +660,7 @@ on_tracklist_mouse_click               (GtkWidget* treeView,
                                         gpointer user_data)
 {
     if ( event->type == GDK_BUTTON_PRESS && event->button == 3 &&
-        GTK_WIDGET_SENSITIVE(lookup_widget(win_main, "rip_button")) )
+        gtk_widget_get_sensitive(lookup_widget(win_main, "rip_button")) )
     {
         GtkWidget* menu;
         GtkWidget* menuItem;

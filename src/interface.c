@@ -346,7 +346,7 @@ create_prefs (void)
     gtk_window_set_modal (GTK_WINDOW (prefs), TRUE);
     gtk_window_set_type_hint (GTK_WINDOW (prefs), GDK_WINDOW_TYPE_HINT_DIALOG);
 
-    vbox = GTK_DIALOG (prefs)->vbox;
+    vbox = gtk_dialog_get_content_area(GTK_DIALOG(prefs));
     gtk_widget_show (vbox);
 
     notebook1 = gtk_notebook_new ();
@@ -1152,7 +1152,7 @@ create_ripping (void)
     gtk_window_set_modal (GTK_WINDOW (ripping), TRUE);
     gtk_window_set_type_hint (GTK_WINDOW (ripping), GDK_WINDOW_TYPE_HINT_DIALOG);
 
-    dialog_vbox2 = GTK_DIALOG (ripping)->vbox;
+    dialog_vbox2 = gtk_dialog_get_content_area(GTK_DIALOG(ripping));
     gtk_widget_show (dialog_vbox2);
 
     table3 = gtk_table_new (3, 2, FALSE);

@@ -1082,7 +1082,7 @@ create_prefs (void)
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label);
     /* END ADVANCED tab */
 
-    dialog_action_area1 = GTK_DIALOG (prefs)->action_area;
+    dialog_action_area1 = gtk_dialog_get_action_area(GTK_DIALOG(prefs));
     gtk_widget_show (dialog_action_area1);
     gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
@@ -1198,7 +1198,7 @@ create_ripping (void)
                                         (GtkAttachOptions) (0), 5, 0);
     gtk_misc_set_alignment (GTK_MISC (label27), 0, 0.5);
 
-    dialog_action_area2 = GTK_DIALOG (ripping)->action_area;
+    dialog_action_area2 = gtk_dialog_get_action_area(GTK_DIALOG(ripping));
     gtk_widget_show (dialog_action_area2);
     gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area2), GTK_BUTTONBOX_END);
 

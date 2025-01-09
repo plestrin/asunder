@@ -326,7 +326,7 @@ on_press_f2                       (void)
 
     treeView = lookup_widget(win_main, "tracklist");
 
-    if (!GTK_WIDGET_HAS_FOCUS(treeView))
+    if (!gtk_widget_has_focus(treeView))
         return;
 
     gtk_tree_view_get_cursor(GTK_TREE_VIEW(treeView), &treePath, &focusColumn);

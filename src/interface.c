@@ -1121,12 +1121,12 @@ create_prefs (void)
     cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
     gtk_widget_show (cancelbutton1);
     gtk_dialog_add_action_widget (GTK_DIALOG (prefs), cancelbutton1, GTK_RESPONSE_CANCEL);
-    GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
+    gtk_widget_set_can_default(cancelbutton1, TRUE);
 
     okbutton1 = gtk_button_new_from_stock ("gtk-ok");
     gtk_widget_show (okbutton1);
     gtk_dialog_add_action_widget (GTK_DIALOG (prefs), okbutton1, GTK_RESPONSE_OK);
-    GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
+    gtk_widget_set_can_default(okbutton1, TRUE);
 
     g_signal_connect ((gpointer) prefs, "response",
                                         G_CALLBACK (on_prefs_response),
@@ -1237,7 +1237,7 @@ create_ripping (void)
     cancel = gtk_button_new_from_stock ("gtk-cancel");
     gtk_widget_show (cancel);
     gtk_dialog_add_action_widget (GTK_DIALOG (ripping), cancel, GTK_RESPONSE_CANCEL);
-    GTK_WIDGET_SET_FLAGS (cancel, GTK_CAN_DEFAULT);
+    gtk_widget_set_can_default(cancel, TRUE);
 
     g_signal_connect ((gpointer) cancel, "clicked",
                                         G_CALLBACK (on_cancel_clicked),

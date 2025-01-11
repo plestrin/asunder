@@ -1,2 +1,4 @@
 build/
 asunder
+build_debug/
+asunder_debug

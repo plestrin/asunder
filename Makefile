@@ -1,7 +1,7 @@
 EXE := asunder
 CC := clang
-CFLAGS := -Wall -Wextra -O2 -Wno-deprecated-declarations $(shell pkg-config --cflags gtk+-2.0 libcddb)
-LDFLAGS := $(shell pkg-config --libs gtk+-2.0 libcddb) -lgthread-2.0 -pthread
+CFLAGS := -Wall -Wextra -O2 -Wno-deprecated-declarations $(shell pkg-config --cflags gtk+-3.0 libcddb)
+LDFLAGS := $(shell pkg-config --libs gtk+-3.0 libcddb) -lgthread-2.0 -pthread
 CFLAGS_DEBUG := $(CFLAGS) -fsanitize=address -g
 LDFLAGS_DEBUG := $(LDFLAGS) -fsanitize=address -g
 OBJS := wrappers.o threads.o prefs.o main.o support.o util.o interface.o callbacks.o completion.o

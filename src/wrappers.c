@@ -565,7 +565,7 @@ void ogg_enc(int tracknum, char* artist, char* album, char* title, char* year, c
     }
 }
 
-void opus_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int bitrate, double* progress){
+void opus_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int bitrate){
     int fd;
 
     int pos;
@@ -801,7 +801,7 @@ void flac_enc(int tracknum, char* artist, char* album, char* title, char* year, 
     }
 }
 
-void wavpack_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int compression, bool hybrid, int bitrate, double* progress){
+void wavpack_enc(char* wavfilename, int compression, bool hybrid, int bitrate, double* progress){
     const char* args[10];
     int fd;
     int pos;
@@ -890,7 +890,7 @@ void wavpack_enc(int tracknum, char* artist, char* album, char* title, char* yea
     }
 }
 
-void monkey_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int compression, double* progress){
+void monkey_enc(char* wavfilename, char* file_name, int compression, double* progress){
     const char* args[5];
     int fd;
     int pos;
@@ -944,7 +944,7 @@ void monkey_enc(int tracknum, char* artist, char* album, char* title, char* year
     }
 }
 
-void musepack_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int quality, double* progress){
+void musepack_enc(char* wavfilename, char* file_name, int quality, double* progress){
     const char* args[7];
     int fd;
     int pos;
@@ -1004,7 +1004,7 @@ void musepack_enc(int tracknum, char* artist, char* album, char* title, char* ye
     }
 }
 
-void aac_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int quality, double* progress){
+void aac_enc(int tracknum, char* artist, char* album, char* title, char* year, char* genre, char* wavfilename, char* file_name, int quality){
     const char* args[9];
     char* dynamic_args[6];
     int fd;

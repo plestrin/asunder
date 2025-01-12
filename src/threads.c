@@ -42,12 +42,10 @@ static unsigned int tracks_to_rip;
 static double rip_percent;
 static double mp3_percent;
 static double ogg_percent;
-static double opus_percent;
 static double flac_percent;
 static double wavpack_percent;
 static double monkey_percent;
 static double musepack_percent;
-static double aac_percent;
 static unsigned int rip_tracks_completed;
 static unsigned int encode_tracks_completed;
 
@@ -345,12 +343,10 @@ void dorip(void){
 	rip_percent = 0.0;
 	mp3_percent = 0.0;
 	ogg_percent = 0.0;
-	opus_percent = 0.0;
 	flac_percent = 0.0;
 	wavpack_percent = 0.0;
 	monkey_percent = 0.0;
 	musepack_percent = 0.0;
-	aac_percent = 0.0;
 	rip_tracks_completed = 0;
 	encode_tracks_completed = 0;
 
@@ -611,7 +607,7 @@ static gpointer encode(gpointer data){
 
 			strcpy(ext_ptr, ".opus");
 
-			opus_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->opus_bitrate, &opus_percent);
+			opus_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->opus_bitrate);
 
 			write_playlist(playlist_opus)
 		}
@@ -633,7 +629,7 @@ static gpointer encode(gpointer data){
 
 			strcpy(ext_ptr, ".wv");
 
-			wavpack_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->wavpack_compression, global_prefs->wavpack_hybrid, int_to_wavpack_bitrate(global_prefs->wavpack_bitrate), &wavpack_percent);
+			wavpack_enc(cursor->rip_name, global_prefs->wavpack_compression, global_prefs->wavpack_hybrid, int_to_wavpack_bitrate(global_prefs->wavpack_bitrate), &wavpack_percent);
 
 			write_playlist(playlist_wavpack)
 		}
@@ -644,7 +640,7 @@ static gpointer encode(gpointer data){
 
 			strcpy(ext_ptr, ".ape");
 
-			monkey_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, int_to_monkey_int(global_prefs->monkey_compression), &monkey_percent);
+			monkey_enc(cursor->rip_name, file_name, int_to_monkey_int(global_prefs->monkey_compression), &monkey_percent);
 
 			write_playlist(playlist_monkey)
 		}
@@ -655,7 +651,7 @@ static gpointer encode(gpointer data){
 
 			strcpy(ext_ptr, ".mpc");
 
-			musepack_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, int_to_musepack_int(global_prefs->musepack_bitrate), &musepack_percent);
+			musepack_enc(cursor->rip_name, file_name, int_to_musepack_int(global_prefs->musepack_bitrate), &musepack_percent);
 
 			write_playlist(playlist_musepack)
 		}
@@ -666,7 +662,7 @@ static gpointer encode(gpointer data){
 
 			strcpy(ext_ptr, ".m4a");
 
-			aac_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->aac_quality, &aac_percent);
+			aac_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->aac_quality);
 
 			write_playlist(playlist_aac)
 		}
@@ -681,12 +677,10 @@ static gpointer encode(gpointer data){
 
 		mp3_percent			= 0.0;
 		ogg_percent			= 0.0;
-		opus_percent		= 0.0;
 		flac_percent		= 0.0;
 		wavpack_percent		= 0.0;
 		monkey_percent		= 0.0;
 		musepack_percent	= 0.0;
-		aac_percent			= 0.0;
 		encode_tracks_completed++;
 	}
 
@@ -785,7 +779,7 @@ static gpointer track(gpointer data){
 		{
 			pencode = ((double)encode_tracks_completed/(double)tracks_to_rip) +
 					   ((mp3_percent+ogg_percent+flac_percent+wavpack_percent+monkey_percent
-						 +opus_percent+musepack_percent+aac_percent) /
+						 +musepack_percent) /
 						(parts-1) / tracks_to_rip);
 			snprintf(sencode, 13, "%d%% (%u/%u)", (int)(pencode*100),
 					 (encode_tracks_completed < tracks_to_rip)

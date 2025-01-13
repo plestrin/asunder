@@ -214,7 +214,7 @@ int int_to_musepack_bitrate(int i)
         return 240;
     }
 
-    fprintf(stderr, "int_to_wavpack_bitrate() called with bad parameter (%d)\n", i);
+    fprintf(stderr, "int_to_musepack_bitrate() called with bad parameter (%d)\n", i);
     return 90;
 }
 

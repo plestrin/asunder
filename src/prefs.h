@@ -39,6 +39,9 @@ struct prefs
     int do_fast_rip;
 };
 
+#define PREFS_DEFAULT_OGG_QUALITY 6
+#define PREFS_DEFAULT_AAC_QUALITY 60
+
 extern struct prefs* global_prefs;
 
 void delete_prefs(struct prefs* p);

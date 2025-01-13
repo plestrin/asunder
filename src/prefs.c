@@ -90,7 +90,7 @@ struct prefs * get_default_prefs(void){
     p->rip_wavpack                  = 0;
     p->mp3_vbr                      = 1;
     p->mp3_bitrate                  = 10;
-    p->ogg_quality                  = 6;
+    p->ogg_quality                  = PREFS_DEFAULT_OGG_QUALITY;
     p->flac_compression             = 5;
     p->wavpack_compression          = 1;
     p->wavpack_hybrid               = 1;
@@ -98,7 +98,7 @@ struct prefs * get_default_prefs(void){
     p->rip_monkey                   = 0;
     p->monkey_compression           = 2;
     p->rip_aac                      = 0;
-    p->aac_quality                  = 60;
+    p->aac_quality                  = PREFS_DEFAULT_AAC_QUALITY;
     p->rip_musepack                 = 0;
     p->musepack_bitrate             = 2;
     p->rip_opus                     = 0;
@@ -138,20 +138,20 @@ void set_widgets_from_prefs(struct prefs* p){
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_flac")), p->rip_flac);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_wavpack")), p->rip_wavpack);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "mp3_vbr")), p->mp3_vbr);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "mp3bitrate")), p->mp3_bitrate);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "oggquality")), p->ogg_quality);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "flaccompression")), p->flac_compression);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "mp3_bitrate")), p->mp3_bitrate);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "ogg_quality")), p->ogg_quality);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "flac_compression")), p->flac_compression);
     gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "wavpack_compression")), p->wavpack_compression);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "wavpack_hybrid")), p->wavpack_hybrid);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "wavpack_bitrate_slider")), p->wavpack_bitrate);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "wavpack_bitrate")), p->wavpack_bitrate);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_monkey")), p->rip_monkey);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "monkey_compression_slider")), p->monkey_compression);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "monkey_compression")), p->monkey_compression);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_aac")), p->rip_aac);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "aac_quality_slider")), p->aac_quality);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "aac_quality")), p->aac_quality);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_musepack")), p->rip_musepack);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "musepack_bitrate_slider")), p->musepack_bitrate);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "musepack_bitrate")), p->musepack_bitrate);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_opus")), p->rip_opus);
-    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "opusrate")), p->opus_bitrate);
+    gtk_range_set_value(GTK_RANGE(lookup_widget(win_prefs, "opus_bitrate")), p->opus_bitrate);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "eject_on_done")), p->eject_on_done);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "do_cddb_updates")), p->do_cddb_updates);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "use_proxy")), p->use_proxy);
@@ -173,31 +173,31 @@ void set_widgets_from_prefs(struct prefs* p){
 
     /* disable widgets if needed */
     if (!p->rip_mp3){
-        disable_mp3_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "mp3_box"), FALSE);
     }
     if (!p->rip_ogg){
-        disable_ogg_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "ogg_box"), FALSE);
     }
     if (!p->rip_flac){
-        disable_flac_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "flac_box"), FALSE);
     }
     if (!p->rip_wavpack){
-        disable_wavpack_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_box"), FALSE);
     }
-    else{
-        enable_wavpack_widgets(); /* need this to potentially disable hybrid widgets */
+    else if (!p->wavpack_hybrid){
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_hybrid_box"), FALSE);
     }
     if (!p->rip_monkey){
-        disable_monkey_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "monkey_box"), FALSE);
     }
     if (!p->rip_aac){
-        disable_aac_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "aac_box"), FALSE);
     }
     if (!p->rip_musepack){
-        disable_musepack_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "musepack_box"), FALSE);
     }
     if (!p->rip_opus){
-        disable_opus_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "opus_box"), FALSE);
     }
 }
 
@@ -223,20 +223,20 @@ void get_prefs_from_widgets(struct prefs* p){
     p->rip_flac                     = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_flac")));
     p->rip_wavpack                  = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_wavpack")));
     p->mp3_vbr                      = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "mp3_vbr")));
-    p->mp3_bitrate                  = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "mp3bitrate")));
-    p->ogg_quality                  = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "oggquality")));
-    p->flac_compression             = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "flaccompression")));
+    p->mp3_bitrate                  = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "mp3_bitrate")));
+    p->ogg_quality                  = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "ogg_quality")));
+    p->flac_compression             = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "flac_compression")));
     p->wavpack_compression          = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "wavpack_compression")));
     p->wavpack_hybrid               = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "wavpack_hybrid")));
-    p->wavpack_bitrate              = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "wavpack_bitrate_slider")));
+    p->wavpack_bitrate              = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "wavpack_bitrate")));
     p->rip_monkey                   = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_monkey")));
-    p->monkey_compression           = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "monkey_compression_slider")));
+    p->monkey_compression           = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "monkey_compression")));
     p->rip_aac                      = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_aac")));
-    p->aac_quality                  = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "aac_quality_slider")));
+    p->aac_quality                  = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "aac_quality")));
     p->rip_musepack                 = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_musepack")));
-    p->musepack_bitrate             = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "musepack_bitrate_slider")));
+    p->musepack_bitrate             = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "musepack_bitrate")));
     p->rip_opus                     = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "rip_opus")));
-    p->opus_bitrate                 = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "opusrate")));
+    p->opus_bitrate                 = (int)gtk_range_get_value(GTK_RANGE(lookup_widget(win_prefs, "opus_bitrate")));
     p->eject_on_done                = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "eject_on_done")));
     p->do_cddb_updates              = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "do_cddb_updates")));
     p->use_proxy                    = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "use_proxy")));

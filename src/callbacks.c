@@ -223,24 +223,21 @@ on_vbr_toggled                         (GtkToggleButton *togglebutton,
 
     /* update the displayed vbr, as it's different for vbr and non-vbr */
     vbr = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(togglebutton));
-    range = GTK_RANGE(lookup_widget(win_prefs, "mp3bitrate"));
+    range = GTK_RANGE(lookup_widget(win_prefs, "mp3_bitrate"));
     snprintf(bitrate, 8, _("%dKbps"), int_to_bitrate((int)gtk_range_get_value(range), vbr));
     gtk_label_set_text(GTK_LABEL(lookup_widget(win_prefs, "bitrate_lbl_2")), bitrate);
 }
 
 void
-on_hybrid_toggled                      (GtkToggleButton *togglebutton,
-                                        gpointer         user_data)
+on_hybrid_toggled(GtkToggleButton *togglebutton, gpointer user_data)
 {
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_prefs, "wavpack_hybrid"))))
+    if (gtk_toggle_button_get_active(togglebutton))
     {
-        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_bitrate_lbl"), TRUE);
-        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_bitrate_slider"), TRUE);
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_hybrid_box"), TRUE);
     }
     else
     {
-        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_bitrate_lbl"), FALSE);
-        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_bitrate_slider"), FALSE);
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_hybrid_box"), FALSE);
     }
 }
 
@@ -256,23 +253,16 @@ on_mp3bitrate_value_changed            (GtkRange        *range,
     gtk_label_set_text(GTK_LABEL(lookup_widget(win_prefs, "bitrate_lbl_2")), bitrate);
 }
 
-void
-on_opusrate_value_changed           (GtkRange   *range,
-                                     gpointer   user_data)
+gchar *
+format_opus_bitrate(GtkScale *scale, gdouble arg1, gpointer user_data)
 {
-    char bitrate[8];
-    snprintf(bitrate, 8, _("%dKbps"), int_to_bitrate((int)gtk_range_get_value(range), FALSE));
-    gtk_label_set_text(GTK_LABEL(lookup_widget(win_prefs, "bitrate_lbl_4")), bitrate);
+    return g_strdup_printf (_("%dKbps"), int_to_bitrate((int)arg1, FALSE));
 }
 
-void
-on_musepackbitrate_value_changed            (GtkRange        *range,
-                                             gpointer         user_data)
+gchar *
+format_musepack_bitrate(GtkScale *scale, gdouble arg1, gpointer user_data)
 {
-    char bitrate[8];
-
-    snprintf(bitrate, 8, _("%dKbps"), int_to_musepack_bitrate((int)gtk_range_get_value(range)));
-    gtk_label_set_text(GTK_LABEL(lookup_widget(win_prefs, "bitrate_lbl_3")), bitrate);
+    return g_strdup_printf(_("%dKbps"), int_to_musepack_bitrate((int)arg1));
 }
 
 void
@@ -403,9 +393,9 @@ on_rip_mp3_toggled                     (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_mp3_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "mp3_box"), FALSE);
     else
-        enable_mp3_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "mp3_box"), TRUE);
 }
 
 void
@@ -428,9 +418,9 @@ on_rip_flac_toggled                    (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_flac_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "flac_box"), FALSE);
     else
-        enable_flac_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "flac_box"), TRUE);
 }
 
 void
@@ -453,9 +443,9 @@ on_rip_ogg_toggled                     (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_ogg_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "ogg_box"), FALSE);
     else
-        enable_ogg_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "ogg_box"), TRUE);
 }
 
 void
@@ -475,13 +465,12 @@ on_rip_opus_toggled                     (GtkToggleButton *togglebutton,
 
         global_prefs->rip_opus=0;
         gtk_toggle_button_set_active(togglebutton, global_prefs->rip_opus);
-
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_opus_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "opus_box"), FALSE);
     else
-        enable_opus_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "opus_box"), TRUE);
 }
 
 void
@@ -504,9 +493,9 @@ on_rip_wavpack_toggled                 (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_wavpack_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_box"), FALSE);
     else
-        enable_wavpack_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "wavpack_box"), TRUE);
 }
 
 void
@@ -529,9 +518,9 @@ on_rip_monkey_toggled                  (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_monkey_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "monkey_box"), FALSE);
     else
-        enable_monkey_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "monkey_box"), TRUE);
 }
 
 void
@@ -554,9 +543,9 @@ on_rip_aac_toggled                  (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_aac_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "aac_box"), FALSE);
     else
-        enable_aac_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "aac_box"), TRUE);
 }
 
 void
@@ -579,9 +568,9 @@ on_rip_musepack_toggled                  (GtkToggleButton *togglebutton,
     }
 
     if (!gtk_toggle_button_get_active(togglebutton))
-        disable_musepack_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "musepack_box"), FALSE);
     else
-        enable_musepack_widgets();
+        gtk_widget_set_sensitive(lookup_widget(win_prefs, "musepack_box"), TRUE);
 }
 
 void on_rip_toggled(GtkCellRendererToggle* cell, gchar* path_string, gpointer user_data){

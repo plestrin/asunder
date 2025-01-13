@@ -82,13 +82,15 @@ void
 on_mp3bitrate_value_changed            (GtkRange        *range,
                                         gpointer         user_data);
 
-void
-on_opusrate_value_changed               (GtkRange       *range,
-                                         gpointer        user_data);
+gchar *
+format_opus_bitrate                     (GtkScale        *scale,
+                                         gdouble          arg1,
+                                         gpointer         user_data);
 
-void
-on_musepackbitrate_value_changed            (GtkRange        *range,
-                                             gpointer         user_data);
+gchar *
+format_musepack_bitrate                 (GtkScale        *scale,
+                                         gdouble          arg1,
+                                         gpointer         user_data);
 
 void
 on_wavpackcompression_value_changed    (GtkRange        *range,

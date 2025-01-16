@@ -44,8 +44,8 @@ create_main (void)
     GtkWidget *main_win;
     GtkWidget *vbox1;
     GtkWidget *toolbar1;
-    GtkWidget *lookup;
-    GtkWidget *preferences;
+    GtkToolItem *lookup;
+    GtkToolItem *preferences;
     GtkWidget *table2;
     GtkWidget *album_artist;
     GtkWidget *album_title;
@@ -67,6 +67,7 @@ create_main (void)
     GtkWidget *album_genre;			// lnr
     GtkWidget *genre_label;			// lnr
     GtkWidget *single_genre;		// lnr
+    GtkWidget* icon;
 
     main_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (main_win), "Asunder");
@@ -78,22 +79,23 @@ create_main (void)
     gtk_container_add (GTK_CONTAINER (main_win), vbox1);
 
     toolbar1 = gtk_toolbar_new ();
+    gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_BOTH_HORIZ);
     gtk_widget_show (toolbar1);
     gtk_box_pack_start (GTK_BOX (vbox1), toolbar1, FALSE, FALSE, 0);
-    gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_BOTH_HORIZ);
 
-    GtkWidget* icon;
-    icon = gtk_image_new_from_stock(GTK_STOCK_REFRESH, gtk_toolbar_get_icon_size(GTK_TOOLBAR(toolbar1)));
+    icon = gtk_image_new_from_icon_name("view-refresh", gtk_toolbar_get_icon_size(GTK_TOOLBAR(toolbar1)));
     gtk_widget_show (icon);
-    lookup = (GtkWidget*)gtk_tool_button_new(icon, _("CDDB Lookup"));
-    gtk_widget_show (lookup);
-    gtk_container_add (GTK_CONTAINER (toolbar1), lookup);
-    gtk_tool_item_set_is_important (GTK_TOOL_ITEM (lookup), TRUE);
+    lookup = gtk_tool_button_new(icon, _("CDDB Lookup"));
+    gtk_tool_item_set_is_important (lookup, TRUE);
+    gtk_widget_show (GTK_WIDGET(lookup));
+    gtk_toolbar_insert (GTK_TOOLBAR (toolbar1), lookup, 0);
 
-    preferences = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-preferences");
-    gtk_widget_show (preferences);
-    gtk_container_add (GTK_CONTAINER (toolbar1), preferences);
-    gtk_tool_item_set_is_important (GTK_TOOL_ITEM (preferences), TRUE);
+    icon = gtk_image_new_from_icon_name("gtk-preferences", gtk_toolbar_get_icon_size(GTK_TOOLBAR(toolbar1)));
+    gtk_widget_show (icon);
+    preferences = gtk_tool_button_new (icon, "Preferences");
+    gtk_tool_item_set_is_important (preferences, TRUE);
+    gtk_widget_show (GTK_WIDGET(preferences));
+    gtk_toolbar_insert (GTK_TOOLBAR (toolbar1), preferences, 0);
 
     table2 = gtk_table_new (3, 3, FALSE);
     gtk_widget_show (table2);
@@ -206,7 +208,7 @@ create_main (void)
     gtk_widget_show (hbox4);
     gtk_container_add (GTK_CONTAINER (alignment3), hbox4);
 
-    image1 = gtk_image_new_from_stock ("gtk-cdrom", GTK_ICON_SIZE_BUTTON);
+    image1 = gtk_image_new_from_icon_name("media-optical", GTK_ICON_SIZE_BUTTON);
     gtk_widget_show (image1);
     gtk_box_pack_start (GTK_BOX (hbox4), image1, FALSE, FALSE, 0);
 
@@ -277,7 +279,6 @@ create_main (void)
 
     /* Store pointers to all widgets, for use by lookup_widget(). */
     GLADE_HOOKUP_OBJECT_NO_REF (main_win, main_win, "main");
-    GLADE_HOOKUP_OBJECT (main_win, vbox1, "vbox1");
     GLADE_HOOKUP_OBJECT (main_win, toolbar1, "toolbar1");
     GLADE_HOOKUP_OBJECT (main_win, lookup, "lookup");
     GLADE_HOOKUP_OBJECT (main_win, preferences, "preferences");
@@ -292,8 +293,6 @@ create_main (void)
     GLADE_HOOKUP_OBJECT (main_win, scrolledwindow1, "scrolledwindow1");
     GLADE_HOOKUP_OBJECT (main_win, tracklist, "tracklist");
     GLADE_HOOKUP_OBJECT (main_win, rip_button, "rip_button");
-    GLADE_HOOKUP_OBJECT (main_win, image1, "image1");
-    GLADE_HOOKUP_OBJECT (main_win, label8, "label8");
     GLADE_HOOKUP_OBJECT (main_win, statusLbl, "statusLbl");
     GLADE_HOOKUP_OBJECT (main_win, album_genre, "album_genre");			// lnr
     GLADE_HOOKUP_OBJECT (main_win, genre_label, "genre_label" );		// lnr
@@ -402,12 +401,7 @@ create_prefs (void)
     gtk_widget_show (vbox);
     gtk_container_add (GTK_CONTAINER (frame2), vbox);
 
-    label = gtk_label_new (_("%A - Artist\n%L - Album\n%N - Track number (2-digit)\n%Y - Year (4-digit or \"0\")\n%T - Song title"));
-    gtk_widget_show (label);
-    gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
-
-    label = gtk_label_new (_("%G - Genre"));
+    label = gtk_label_new (_("%A - Artist\n%L - Album\n%N - Track number (2-digit)\n%Y - Year (4-digit or \"0\")\n%T - Song title\n%G - Genre"));
     gtk_widget_show (label);
     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
@@ -418,55 +412,47 @@ create_prefs (void)
     //~ gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
     //~ gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
 
-    table1 = gtk_table_new (3, 2, FALSE);
+    table1 = gtk_grid_new();
+    gtk_grid_set_column_spacing(table1, 5);
     gtk_widget_show (table1);
     gtk_box_pack_start (GTK_BOX (vbox), table1, TRUE, TRUE, 0);
 
-    label = gtk_label_new (_("Album directory: "));
+    label = gtk_label_new (_("Album directory:"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_show (label);
-    gtk_table_attach (GTK_TABLE (table1), label, 0, 1, 0, 1,
-                                        (GtkAttachOptions) (GTK_FILL),
-                                        (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+    gtk_grid_attach (GTK_GRID (table1), label, 0, 0, 1, 1);
 
-    label = gtk_label_new (_("Playlist file: "));
+    label = gtk_label_new (_("Playlist file:"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_show (label);
-    gtk_table_attach (GTK_TABLE (table1), label, 0, 1, 1, 2,
-                                        (GtkAttachOptions) (GTK_FILL),
-                                        (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+    gtk_grid_attach (GTK_GRID (table1), label, 0, 1, 1, 1);
 
-    label = gtk_label_new (_("Music file: "));
+    label = gtk_label_new (_("Music file:"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_show (label);
-    gtk_table_attach (GTK_TABLE (table1), label, 0, 1, 2, 3,
-                                        (GtkAttachOptions) (GTK_FILL),
-                                        (GtkAttachOptions) (0), 0, 0);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+    gtk_grid_attach (GTK_GRID (table1), label, 0, 2, 1, 1);
 
     format_albumdir = gtk_entry_new ();
+    gtk_widget_set_hexpand(format_albumdir, TRUE);
     gtk_widget_show (format_albumdir);
-    gtk_table_attach (GTK_TABLE (table1), format_albumdir, 1, 2, 0, 1,
-                                        (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                                        (GtkAttachOptions) (0), 0, 0);
+    gtk_grid_attach (GTK_GRID (table1), format_albumdir, 1, 0, 1, 1);
     gtk_widget_set_tooltip_text(format_albumdir, _("This is relative to the destination folder (from the General tab).\n"
                                                    "Can be blank.\n"
                                                    "Default: %A - %L\n"
                                                    "Other example: %A/%L"));
 
     format_playlist = gtk_entry_new ();
+    gtk_widget_set_hexpand(format_playlist, TRUE);
     gtk_widget_show (format_playlist);
-    gtk_table_attach (GTK_TABLE (table1), format_playlist, 1, 2, 1, 2,
-                                        (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                                        (GtkAttachOptions) (0), 0, 0);
+    gtk_grid_attach (GTK_GRID (table1), format_playlist, 1, 1, 1, 1);
     gtk_widget_set_tooltip_text(format_playlist, _("This will be stored in the album directory.\n"
                                                    "Can be blank.\n"
                                                    "Default: %A - %L"));
 
     format_music = gtk_entry_new ();
+    gtk_widget_set_hexpand(format_music, TRUE);
     gtk_widget_show (format_music);
-    gtk_table_attach (GTK_TABLE (table1), format_music, 1, 2, 2, 3,
-                                        (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                                        (GtkAttachOptions) (0), 0, 0);
+    gtk_grid_attach (GTK_GRID (table1), format_music, 1, 2, 1, 1);
     gtk_widget_set_tooltip_text(format_music, _("This will be stored in the album directory.\n"
                                                 "Cannot be blank.\n"
                                                 "Default: %A - %T\n"
@@ -1163,9 +1149,6 @@ create_ripping (void)
     GLADE_HOOKUP_OBJECT (ripping, progress_total, "progress_total");
     GLADE_HOOKUP_OBJECT (ripping, progress_rip, "progress_rip");
     GLADE_HOOKUP_OBJECT (ripping, progress_encode, "progress_encode");
-    GLADE_HOOKUP_OBJECT (ripping, label25, "label25");
-    GLADE_HOOKUP_OBJECT (ripping, label26, "label26");
-    GLADE_HOOKUP_OBJECT (ripping, label27, "label27");
     GLADE_HOOKUP_OBJECT_NO_REF (ripping, dialog_action_area2, "dialog_action_area2");
     GLADE_HOOKUP_OBJECT (ripping, cancel, "cancel");
 

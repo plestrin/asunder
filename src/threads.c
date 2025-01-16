@@ -34,9 +34,9 @@ bool aborted;
 /* for stopping the tracking thread */
 static bool allDone;
 
-static GThread * ripper;
-static GThread * encoder;
-static GThread * tracker;
+static GThread *ripper;
+static GThread *encoder;
+static GThread *tracker;
 
 static unsigned int tracks_to_rip;
 static double rip_percent;
@@ -54,7 +54,8 @@ static gpointer rip(gpointer data);
 static gpointer track(gpointer data);
 
 // aborts ripping- stops all the threads and return to normal execution
-void abort_threads(void){
+void abort_threads(void)
+{
 	aborted = true;
 
 	if (cdparanoia_pid != 0)
@@ -63,7 +64,7 @@ void abort_threads(void){
 		kill(lame_pid, SIGKILL);
 	if (oggenc_pid != 0)
 		kill(oggenc_pid, SIGKILL);
-	if (opusenc_pid !=0)
+	if (opusenc_pid != 0)
 		kill(opusenc_pid, SIGKILL);
 	if (flac_pid != 0)
 		kill(flac_pid, SIGKILL);
@@ -77,19 +78,20 @@ void abort_threads(void){
 		kill(aac_pid, SIGKILL);
 
 	/* wait until all the worker threads are done */
-	while (cdparanoia_pid | lame_pid | oggenc_pid | opusenc_pid | flac_pid | wavpack_pid | monkey_pid |musepack_pid | aac_pid){
+	while (cdparanoia_pid | lame_pid | oggenc_pid | opusenc_pid | flac_pid | wavpack_pid |
+		   monkey_pid | musepack_pid | aac_pid) {
 		usleep(100000);
 	}
 
 	g_cond_broadcast(&available);
 
-	debugLog("Aborting: 1\n")
+	debugLog("Aborting: 1\n");
 	g_thread_join(ripper);
-	debugLog("Aborting: 2\n")
+	debugLog("Aborting: 2\n");
 	g_thread_join(encoder);
-	debugLog("Aborting: 3\n")
+	debugLog("Aborting: 3\n");
 	g_thread_join(tracker);
-	debugLog("Aborting: 4 (All threads joined)\n")
+	debugLog("Aborting: 4 (All threads joined)\n");
 
 	gtk_window_set_title(GTK_WINDOW(win_main), "Asunder");
 
@@ -97,170 +99,175 @@ void abort_threads(void){
 	gdk_flush();
 	working = false;
 
-	show_completed_dialog(numCdparanoiaOk + numLameOk + numOggOk + numOpusOk + numFlacOk + numWavpackOk + numMonkeyOk + numMusepackOk + numAacOk,
-						  numCdparanoiaFailed + numLameFailed + numOggFailed + numOpusFailed + numFlacFailed + numWavpackFailed + numMonkeyFailed + numMusepackFailed + numAacFailed);
+	show_completed_dialog(numCdparanoiaOk + numLameOk + numOggOk + numOpusOk + numFlacOk +
+							  numWavpackOk + numMonkeyOk + numMusepackOk + numAacOk,
+						  numCdparanoiaFailed + numLameFailed + numOggFailed + numOpusFailed +
+							  numFlacFailed + numWavpackFailed + numMonkeyFailed +
+							  numMusepackFailed + numAacFailed);
 }
 
-struct trackMeta{
-	int				 num_src;
-	int				 num_dst;
-	unsigned int		time;
-	char*			   artist;
-	char*			   title;
-	char*			   rip_name;
-	struct trackMeta*   next;
+struct trackMeta {
+	int num_src;
+	int num_dst;
+	unsigned int time;
+	char *artist;
+	char *title;
+	char *rip_name;
+	struct trackMeta *next;
 };
 
-#define trackMeta_delete(track_meta)			\
-	trackMeta_clean(track_meta);				\
+#define trackMeta_delete(track_meta) \
+	trackMeta_clean(track_meta);     \
 	free(track_meta);
 
-static void trackMeta_clean(struct trackMeta* track_meta){
-	if (track_meta->artist != NULL){
+static void trackMeta_clean(struct trackMeta *track_meta)
+{
+	if (track_meta->artist != NULL) {
 		free(track_meta->artist);
 		track_meta->artist = NULL;
 	}
-	if (track_meta->title != NULL){
+	if (track_meta->title != NULL) {
 		free(track_meta->title);
 		track_meta->title = NULL;
 	}
-	if (track_meta->rip_name != NULL){
+	if (track_meta->rip_name != NULL) {
 		free(track_meta->rip_name);
 		track_meta->rip_name = NULL;
 	}
-	if (track_meta->next != NULL){
+	if (track_meta->next != NULL) {
 		trackMeta_delete(track_meta->next);
 		track_meta->next = NULL;
 	}
 }
 
-struct albumMeta{
-	char*			   artist;
-	char*			   title;
-	char*			   genre;
-	char*			   year;
-	char*			   directory;
-	int				 single_artist;
-	struct trackMeta*   track_meta;
+struct albumMeta {
+	char *artist;
+	char *title;
+	char *genre;
+	char *year;
+	char *directory;
+	int single_artist;
+	struct trackMeta *track_meta;
 };
 
-#define albumMeta_delete(album_meta)			\
-	albumMeta_clean(album_meta);				\
+#define albumMeta_delete(album_meta) \
+	albumMeta_clean(album_meta);     \
 	free(album_meta);
 
-static void albumMeta_clean(struct albumMeta* album_meta){
-	if (album_meta->artist != NULL){
+static void albumMeta_clean(struct albumMeta *album_meta)
+{
+	if (album_meta->artist != NULL) {
 		free(album_meta->artist);
 		album_meta->artist = NULL;
 	}
-	if (album_meta->title != NULL){
+	if (album_meta->title != NULL) {
 		free(album_meta->title);
 		album_meta->title = NULL;
 	}
-	if (album_meta->genre != NULL){
+	if (album_meta->genre != NULL) {
 		free(album_meta->genre);
 		album_meta->genre = NULL;
 	}
-	if (album_meta->year != NULL){
+	if (album_meta->year != NULL) {
 		free(album_meta->year);
 		album_meta->year = NULL;
 	}
-	if (album_meta->directory != NULL){
+	if (album_meta->directory != NULL) {
 		free(album_meta->directory);
 		album_meta->directory = NULL;
 	}
-	if (album_meta->track_meta != NULL){
+	if (album_meta->track_meta != NULL) {
 		trackMeta_delete(album_meta->track_meta);
 		album_meta->track_meta = NULL;
 	}
 }
 
-static struct trackMeta* trackMeta_create(const struct albumMeta* album_meta){
-	GtkTreeIter		 iter;
-	GtkListStore*	   store;
-	int				 i;
-	gboolean			valid_row;
-	int				 track_rip;
-	int				 track_num;
-	const char*		 track_artist;
-	const char*		 track_title;
-	const char*		 track_time;
-	struct trackMeta	track_meta_local;
-	struct trackMeta*   root;
-	struct trackMeta*   current;
-	char*			   tmp;
-	unsigned int		min;
-	unsigned int		sec;
+static struct trackMeta *trackMeta_create(const struct albumMeta *album_meta)
+{
+	GtkTreeIter iter;
+	GtkListStore *store;
+	int i;
+	gboolean valid_row;
+	int track_rip;
+	int track_num;
+	const char *track_artist;
+	const char *track_title;
+	const char *track_time;
+	struct trackMeta track_meta_local;
+	struct trackMeta *root;
+	struct trackMeta *current;
+	char *tmp;
+	unsigned int min;
+	unsigned int sec;
 
-	store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist"))));
+	store = GTK_LIST_STORE(
+		gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist"))));
 
-	for (i = 0, root = NULL, current = NULL, valid_row = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter); valid_row; valid_row = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter), i++){
-		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter,
-			COL_RIPTRACK, &track_rip,
-			COL_TRACKNUM, &track_num,
-			COL_TRACKARTIST, &track_artist,
-			COL_TRACKTITLE, &track_title,
-			COL_TRACKTIME, &track_time,
-			-1);
+	for (i = 0, root = NULL, current = NULL,
+		valid_row = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
+		 valid_row; valid_row = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter), i++) {
+		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, COL_RIPTRACK, &track_rip, COL_TRACKNUM,
+						   &track_num, COL_TRACKARTIST, &track_artist, COL_TRACKTITLE, &track_title,
+						   COL_TRACKTIME, &track_time, -1);
 
-		if (!track_rip){
+		if (!track_rip) {
 			continue;
 		}
 
-		track_meta_local.num_src   = i + 1;
-		track_meta_local.num_dst   = track_num;
+		track_meta_local.num_src = i + 1;
+		track_meta_local.num_dst = track_num;
 
 		sscanf(track_time, "%u:%u", &min, &sec);
 		track_meta_local.time = sec + min * 60;
 
-		if (album_meta->single_artist){
+		if (album_meta->single_artist) {
 			track_meta_local.artist = strdup(album_meta->artist);
-		}
-		else{
+		} else {
 			track_meta_local.artist = strdup(track_artist);
 		}
-		track_meta_local.title	 = strdup(track_title);
-		track_meta_local.rip_name  = NULL;
-		track_meta_local.next	  = NULL;
+		track_meta_local.title = strdup(track_title);
+		track_meta_local.rip_name = NULL;
+		track_meta_local.next = NULL;
 
-		if (track_meta_local.artist == NULL || track_meta_local.title == NULL){
+		if (track_meta_local.artist == NULL || track_meta_local.title == NULL) {
 			trackMeta_clean(&track_meta_local);
 			continue;
 		}
 
-		if (!album_meta->single_artist){
+		if (!album_meta->single_artist) {
 			trim_chars(track_meta_local.artist, BADCHARS);
 		}
 		trim_chars(track_meta_local.title, BADCHARS);
 
-		tmp = parse_format(global_prefs->format_music, track_meta_local.num_dst, album_meta->year, track_meta_local.artist, album_meta->title, album_meta->genre, track_meta_local.title);
-		if (tmp != NULL){
-			track_meta_local.rip_name = make_filename(prefs_get_music_dir(global_prefs), album_meta->directory, tmp, "wav");
+		tmp = parse_format(global_prefs->format_music, track_meta_local.num_dst, album_meta->year,
+						   track_meta_local.artist, album_meta->title, album_meta->genre,
+						   track_meta_local.title);
+		if (tmp != NULL) {
+			track_meta_local.rip_name =
+				make_filename(prefs_get_music_dir(global_prefs), album_meta->directory, tmp, "wav");
 			free(tmp);
 
-			if (track_meta_local.rip_name == NULL){
+			if (track_meta_local.rip_name == NULL) {
 				fprintf(stderr, " unable to make filename\n");
 				trackMeta_clean(&track_meta_local);
 				continue;
 			}
-		}
-		else{
+		} else {
 			fprintf(stderr, "unable to parse music format\n");
 			trackMeta_clean(&track_meta_local);
 			continue;
 		}
 
-		if (current != NULL){
-			if ((current->next = malloc(sizeof(struct trackMeta))) == NULL){
+		if (current != NULL) {
+			if ((current->next = malloc(sizeof(struct trackMeta))) == NULL) {
 				fprintf(stderr, "cannot allocate memory\n");
 				trackMeta_clean(&track_meta_local);
 				continue;
 			}
 
 			current = current->next;
-		}
-		else{
-			if ((root = malloc(sizeof(struct trackMeta))) == NULL){
+		} else {
+			if ((root = malloc(sizeof(struct trackMeta))) == NULL) {
 				fprintf(stderr, "cannot allocate memory\n");
 				trackMeta_clean(&track_meta_local);
 				continue;
@@ -275,13 +282,13 @@ static struct trackMeta* trackMeta_create(const struct albumMeta* album_meta){
 	return root;
 }
 
+static struct albumMeta *albumMeta_create(void)
+{
+	struct albumMeta *album_meta;
+	GtkWidget *album_artist_widget;
+	GtkWidget *album_genre_widget;
 
-static struct albumMeta* albumMeta_create(void){
-	struct albumMeta*   album_meta;
-	GtkWidget *		 album_artist_widget;
-	GtkWidget *		 album_genre_widget;
-
-	if ((album_meta = calloc(1, sizeof(struct albumMeta))) == NULL){
+	if ((album_meta = calloc(1, sizeof(struct albumMeta))) == NULL) {
 		fprintf(stderr, "cannot allocate memory\n");
 		return NULL;
 	}
@@ -289,14 +296,17 @@ static struct albumMeta* albumMeta_create(void){
 	album_artist_widget = lookup_widget(win_main, "album_artist");
 	album_genre_widget = lookup_widget(win_main, "album_genre");
 
-	album_meta->artist		  = strdup(gtk_entry_get_text(GTK_ENTRY(album_artist_widget)));
-	album_meta->title		   = strdup(gtk_entry_get_text(GTK_ENTRY(lookup_widget(win_main, "album_title"))));
-	album_meta->genre		   = strdup(gtk_entry_get_text(GTK_ENTRY(album_genre_widget)));
-	album_meta->year			= strdup(gtk_entry_get_text(GTK_ENTRY(lookup_widget(win_main, "album_year"))));
-	album_meta->directory	   = NULL;
-	album_meta->single_artist   = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_main, "single_artist")));
+	album_meta->artist = strdup(gtk_entry_get_text(GTK_ENTRY(album_artist_widget)));
+	album_meta->title =
+		strdup(gtk_entry_get_text(GTK_ENTRY(lookup_widget(win_main, "album_title"))));
+	album_meta->genre = strdup(gtk_entry_get_text(GTK_ENTRY(album_genre_widget)));
+	album_meta->year = strdup(gtk_entry_get_text(GTK_ENTRY(lookup_widget(win_main, "album_year"))));
+	album_meta->directory = NULL;
+	album_meta->single_artist =
+		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(win_main, "single_artist")));
 
-	if (album_meta->artist == NULL || album_meta->title == NULL || album_meta->genre == NULL || album_meta->year == NULL){
+	if (album_meta->artist == NULL || album_meta->title == NULL || album_meta->genre == NULL ||
+		album_meta->year == NULL) {
 		albumMeta_delete(album_meta);
 		return NULL;
 	}
@@ -311,8 +321,10 @@ static struct albumMeta* albumMeta_create(void){
 	add_completion(album_genre_widget);
 	save_completion(album_genre_widget);
 
-	album_meta->directory = parse_format(global_prefs->format_albumdir, 0, album_meta->year, album_meta->artist, album_meta->title, album_meta->genre, NULL);
-	if (album_meta->directory == NULL){
+	album_meta->directory = parse_format(global_prefs->format_albumdir, 0, album_meta->year,
+										 album_meta->artist, album_meta->title, album_meta->genre,
+										 NULL);
+	if (album_meta->directory == NULL) {
 		albumMeta_delete(album_meta);
 		return NULL;
 	}
@@ -322,24 +334,26 @@ static struct albumMeta* albumMeta_create(void){
 	return album_meta;
 }
 
-static unsigned int albumMeta_get_nb_track(const struct albumMeta* album_meta){
-	unsigned int		result;
-	struct trackMeta*   current;
+static unsigned int albumMeta_get_nb_track(const struct albumMeta *album_meta)
+{
+	unsigned int result;
+	struct trackMeta *current;
 
-	for (current = album_meta->track_meta, result = 0; current != NULL; current = current->next){
-		result ++;
+	for (current = album_meta->track_meta, result = 0; current != NULL; current = current->next) {
+		result++;
 	}
 
 	return result;
 }
 
-void dorip(void){
-	struct albumMeta* album_meta;
+void dorip(void)
+{
+	struct albumMeta *album_meta;
 
-	working	 = true;
-	aborted	 = false;
-	allDone	 = false;
-	counter	 = 0;
+	working = true;
+	aborted = false;
+	allDone = false;
+	counter = 0;
 	rip_percent = 0.0;
 	mp3_percent = 0.0;
 	ogg_percent = 0.0;
@@ -350,32 +364,30 @@ void dorip(void){
 	rip_tracks_completed = 0;
 	encode_tracks_completed = 0;
 
-	if (!(global_prefs->rip_wav | global_prefs->rip_mp3 | global_prefs->rip_ogg | global_prefs->rip_opus | global_prefs->rip_flac | global_prefs->rip_wavpack | global_prefs->rip_monkey | global_prefs->rip_musepack | global_prefs->rip_aac)){
-		GtkWidget * dialog;
-		dialog = gtk_message_dialog_new(GTK_WINDOW(win_main),
-										GTK_DIALOG_DESTROY_WITH_PARENT,
-										GTK_MESSAGE_ERROR,
-										GTK_BUTTONS_OK,
-										_("No ripping/encoding method selected. Please enable one from the "
-										"'Preferences' menu."));
+	if (!(global_prefs->rip_wav | global_prefs->rip_mp3 | global_prefs->rip_ogg |
+		  global_prefs->rip_opus | global_prefs->rip_flac | global_prefs->rip_wavpack |
+		  global_prefs->rip_monkey | global_prefs->rip_musepack | global_prefs->rip_aac)) {
+		GtkWidget *dialog;
+		dialog = gtk_message_dialog_new(
+			GTK_WINDOW(win_main), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+			_("No ripping/encoding method selected. Please enable one from the "
+			  "'Preferences' menu."));
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 		return;
 	}
 
-	if ((album_meta = albumMeta_create()) == NULL){
+	if ((album_meta = albumMeta_create()) == NULL) {
 		fprintf(stderr, "cannot init album metadata structure\n");
 		return;
 	}
 
-	if (!(tracks_to_rip = albumMeta_get_nb_track(album_meta))){
-		GtkWidget * dialog;
-		dialog = gtk_message_dialog_new(GTK_WINDOW(win_main),
-										GTK_DIALOG_DESTROY_WITH_PARENT,
-										GTK_MESSAGE_ERROR,
-										GTK_BUTTONS_OK,
+	if (!(tracks_to_rip = albumMeta_get_nb_track(album_meta))) {
+		GtkWidget *dialog;
+		dialog = gtk_message_dialog_new(GTK_WINDOW(win_main), GTK_DIALOG_DESTROY_WITH_PARENT,
+										GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
 										_("No tracks were selected for ripping/encoding. "
-										"Please select at least one track."));
+										  "Please select at least one track."));
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 
@@ -385,22 +397,21 @@ void dorip(void){
 
 	/* create  the album directory */
 	{
-		char* directory_path;
+		char *directory_path;
 
-		if ((directory_path = make_filename(prefs_get_music_dir(global_prefs), album_meta->directory, NULL, NULL)) == NULL){
+		if ((directory_path = make_filename(prefs_get_music_dir(global_prefs),
+											album_meta->directory, NULL, NULL)) == NULL) {
 			fprintf(stderr, "unable to make filename\n");
 			albumMeta_delete(album_meta);
 			return;
 		}
 
-		if (recursive_mkdir(directory_path, S_IRWXU|S_IRWXG|S_IRWXO) != 0 && errno != EEXIST){
-			GtkWidget * dialog;
-			dialog = gtk_message_dialog_new(GTK_WINDOW(win_main),
-											GTK_DIALOG_DESTROY_WITH_PARENT,
-											GTK_MESSAGE_ERROR,
-											GTK_BUTTONS_OK,
-											"Unable to create directory '%s': %s",
-											directory_path, strerror(errno));
+		if (recursive_mkdir(directory_path, S_IRWXU | S_IRWXG | S_IRWXO) != 0 && errno != EEXIST) {
+			GtkWidget *dialog;
+			dialog = gtk_message_dialog_new(GTK_WINDOW(win_main), GTK_DIALOG_DESTROY_WITH_PARENT,
+											GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+											"Unable to create directory '%s': %s", directory_path,
+											strerror(errno));
 			gtk_dialog_run(GTK_DIALOG(dialog));
 			gtk_widget_destroy(dialog);
 
@@ -434,23 +445,24 @@ void dorip(void){
 	numMusepackOk = 0;
 	numAacOk = 0;
 
-	ripper  = g_thread_new(NULL, rip, album_meta);
+	ripper = g_thread_new(NULL, rip, album_meta);
 	encoder = g_thread_new(NULL, encode, album_meta);
 	tracker = g_thread_new(NULL, track, NULL);
 }
 
-static gpointer rip(gpointer data){
-	const struct albumMeta* album_meta = (const struct albumMeta*)data;
-	struct trackMeta*	   cursor;
+static gpointer rip(gpointer data)
+{
+	const struct albumMeta *album_meta = (const struct albumMeta *)data;
+	struct trackMeta *cursor;
 
-	for (cursor = album_meta->track_meta; cursor != NULL; cursor = cursor->next){
-		if (aborted){
+	for (cursor = album_meta->track_meta; cursor != NULL; cursor = cursor->next) {
+		if (aborted) {
 			return NULL;
 		}
 		cdparanoia(global_prefs->cdrom, cursor->num_src, cursor->rip_name, &rip_percent);
 
 		rip_percent = 0.0;
-		rip_tracks_completed ++;
+		rip_tracks_completed++;
 
 		g_mutex_lock(&barrier);
 		counter++;
@@ -458,238 +470,254 @@ static gpointer rip(gpointer data){
 		g_cond_signal(&available);
 	}
 
-	if (global_prefs->eject_on_done){
-		if (!fork()){
-			const char* args[] = {"eject", global_prefs->cdrom, NULL};
-			execvp(args[0], (char*const*)args);
+	if (global_prefs->eject_on_done) {
+		if (!fork()) {
+			const char *args[] = { "eject", global_prefs->cdrom, NULL };
+			execvp(args[0], (char *const *)args);
 		}
 	}
 
 	return NULL;
 }
 
-#define make_playlist(playlist, playlist_name, ext) 																				\
-	{ 																																\
-		char* filename; 																											\
-																																	\
-		if ((filename = make_filename(prefs_get_music_dir(global_prefs), album_meta->directory, (playlist_name), (ext))) == NULL){ 	\
-			fprintf(stderr, "unable to make filename\n"); 																			\
-		} 																															\
-		else{ 																														\
-			(playlist) = fopen(filename, "w"); 																						\
-			if ((playlist) == NULL){ 																								\
-			   fprintf(stderr, "unable to open file: %s\n", filename); 																\
-			} 																														\
-			free(filename); 																										\
-		} 																															\
+#define make_playlist(playlist, playlist_name, ext)                                             \
+	{                                                                                           \
+		char *filename;                                                                         \
+                                                                                                \
+		if ((filename = make_filename(prefs_get_music_dir(global_prefs), album_meta->directory, \
+									  (playlist_name), (ext))) == NULL) {                       \
+			fprintf(stderr, "unable to make filename\n");                                       \
+		} else {                                                                                \
+			(playlist) = fopen(filename, "w");                                                  \
+			if ((playlist) == NULL) {                                                           \
+				fprintf(stderr, "unable to open file: %s\n", filename);                         \
+			}                                                                                   \
+			free(filename);                                                                     \
+		}                                                                                       \
 	}
 
-#define write_playlist(playlist) 																			\
-	{ 																										\
-		if ((playlist) != NULL){ 																			\
-			if (aborted){ 																					\
-				goto exit; 																					\
-			} 																								\
-																											\
-			fprintf((playlist), "#EXTINF:%u,%s - %s\n", cursor->time, cursor->artist, cursor->title); 		\
-			fprintf((playlist), "%s\n", basename(file_name)); 												\
-		} 																									\
+#define write_playlist(playlist)                                                      \
+	{                                                                                 \
+		if ((playlist) != NULL) {                                                     \
+			if (aborted) {                                                            \
+				goto exit;                                                            \
+			}                                                                         \
+                                                                                      \
+			fprintf((playlist), "#EXTINF:%u,%s - %s\n", cursor->time, cursor->artist, \
+					cursor->title);                                                   \
+			fprintf((playlist), "%s\n", basename(file_name));                         \
+		}                                                                             \
 	}
 
-#define close_playlist(playlist) 																			\
-	{ 																										\
-		if ((playlist) != NULL){ 																			\
-			fclose(playlist); 																				\
-		} 																									\
+#define close_playlist(playlist)  \
+	{                             \
+		if ((playlist) != NULL) { \
+			fclose(playlist);     \
+		}                         \
 	}
 
-static gpointer encode(gpointer data){
-	struct albumMeta* 	album_meta = (struct albumMeta*)data;
-	struct trackMeta* 	cursor;
-	char				file_name[PATH_MAX];
-	char*				ext_ptr;
+static gpointer encode(gpointer data)
+{
+	struct albumMeta *album_meta = (struct albumMeta *)data;
+	struct trackMeta *cursor;
+	char file_name[PATH_MAX];
+	char *ext_ptr;
 
-	FILE* playlist_wav 		= NULL;
-	FILE* playlist_mp3 		= NULL;
-	FILE* playlist_ogg 		= NULL;
-	FILE* playlist_opus 	= NULL;
-	FILE* playlist_flac 	= NULL;
-	FILE* playlist_wavpack 	= NULL;
-	FILE* playlist_monkey 	= NULL;
-	FILE* playlist_musepack = NULL;
-	FILE* playlist_aac 		= NULL;
+	FILE *playlist_wav = NULL;
+	FILE *playlist_mp3 = NULL;
+	FILE *playlist_ogg = NULL;
+	FILE *playlist_opus = NULL;
+	FILE *playlist_flac = NULL;
+	FILE *playlist_wavpack = NULL;
+	FILE *playlist_monkey = NULL;
+	FILE *playlist_musepack = NULL;
+	FILE *playlist_aac = NULL;
 
-	if (global_prefs->make_playlist){
-		char* playlist_name;
+	if (global_prefs->make_playlist) {
+		char *playlist_name;
 
-		playlist_name = parse_format(global_prefs->format_playlist, 0, album_meta->year, album_meta->artist, album_meta->title, album_meta->genre, NULL);
-		if (playlist_name != NULL){
-			if (global_prefs->rip_wav){
+		playlist_name = parse_format(global_prefs->format_playlist, 0, album_meta->year,
+									 album_meta->artist, album_meta->title, album_meta->genre,
+									 NULL);
+		if (playlist_name != NULL) {
+			if (global_prefs->rip_wav) {
 				make_playlist(playlist_wav, playlist_name, "wav.m3u")
 			}
-			if (global_prefs->rip_mp3){
+			if (global_prefs->rip_mp3) {
 				make_playlist(playlist_mp3, playlist_name, "mp3.m3u")
 			}
-			if (global_prefs->rip_ogg){
+			if (global_prefs->rip_ogg) {
 				make_playlist(playlist_ogg, playlist_name, "ogg.m3u")
 			}
-			if (global_prefs->rip_opus){
+			if (global_prefs->rip_opus) {
 				make_playlist(playlist_opus, playlist_name, "opus.m3u")
 			}
-			if (global_prefs->rip_flac){
+			if (global_prefs->rip_flac) {
 				make_playlist(playlist_flac, playlist_name, "flac.m3u")
 			}
-			if (global_prefs->rip_wavpack){
+			if (global_prefs->rip_wavpack) {
 				make_playlist(playlist_wavpack, playlist_name, "wv.m3u")
 			}
-			if (global_prefs->rip_monkey){
+			if (global_prefs->rip_monkey) {
 				make_playlist(playlist_monkey, playlist_name, "ape.m3u")
 			}
-			if (global_prefs->rip_musepack){
+			if (global_prefs->rip_musepack) {
 				make_playlist(playlist_musepack, playlist_name, "mpc.m3u")
 			}
-			if (global_prefs->rip_aac){
+			if (global_prefs->rip_aac) {
 				make_playlist(playlist_aac, playlist_name, "m4a.m3u")
 			}
 
 			free(playlist_name);
-		}
-		else{
+		} else {
 			fprintf(stderr, "Error: unable to parse format\n");
 		}
 	}
 
-	for (cursor = album_meta->track_meta; cursor != NULL; cursor = cursor->next){
+	for (cursor = album_meta->track_meta; cursor != NULL; cursor = cursor->next) {
 		g_mutex_lock(&barrier);
-		while ((counter < 1) && (!aborted)){
+		while ((counter < 1) && (!aborted)) {
 			g_cond_wait(&available, &barrier);
 		}
 		counter--;
 		g_mutex_unlock(&barrier);
 
-		if (aborted){
+		if (aborted) {
 			goto exit;
 		}
 
 		strcpy(file_name, cursor->rip_name);
 		ext_ptr = file_name + strlen(file_name);
 
-		while (ext_ptr != file_name && *ext_ptr != '.'){
-			ext_ptr --;
+		while (ext_ptr != file_name && *ext_ptr != '.') {
+			ext_ptr--;
 		}
 
-		if (global_prefs->rip_mp3){
-			if (aborted){
+		if (global_prefs->rip_mp3) {
+			if (aborted) {
 				return NULL;
 			}
 
 			strcpy(ext_ptr, ".mp3");
 
-			mp3_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->mp3_vbr, global_prefs->mp3_bitrate, &mp3_percent);
+			mp3_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title,
+					album_meta->year, album_meta->genre, cursor->rip_name, file_name,
+					global_prefs->mp3_vbr, global_prefs->mp3_bitrate, &mp3_percent);
 
 			write_playlist(playlist_mp3)
 		}
-		if (global_prefs->rip_ogg){
-			if (aborted){
+		if (global_prefs->rip_ogg) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".ogg");
 
-			ogg_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->ogg_quality, &ogg_percent);
+			ogg_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title,
+					album_meta->year, album_meta->genre, cursor->rip_name, file_name,
+					global_prefs->ogg_quality, &ogg_percent);
 
 			write_playlist(playlist_ogg)
 		}
-		if (global_prefs->rip_opus){
-			if (aborted){
+		if (global_prefs->rip_opus) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".opus");
 
-			opus_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->opus_bitrate);
+			opus_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title,
+					 album_meta->year, album_meta->genre, cursor->rip_name, file_name,
+					 global_prefs->opus_bitrate);
 
 			write_playlist(playlist_opus)
 		}
-		if (global_prefs->rip_flac){
-			if (aborted){
+		if (global_prefs->rip_flac) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".flac");
 
-			flac_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->flac_compression, &flac_percent);
+			flac_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title,
+					 album_meta->year, album_meta->genre, cursor->rip_name, file_name,
+					 global_prefs->flac_compression, &flac_percent);
 
 			write_playlist(playlist_flac)
 		}
-		if (global_prefs->rip_wavpack){
-			if (aborted){
+		if (global_prefs->rip_wavpack) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".wv");
 
-			wavpack_enc(cursor->rip_name, global_prefs->wavpack_compression, global_prefs->wavpack_hybrid, int_to_wavpack_bitrate(global_prefs->wavpack_bitrate), &wavpack_percent);
+			wavpack_enc(cursor->rip_name, global_prefs->wavpack_compression,
+						global_prefs->wavpack_hybrid,
+						int_to_wavpack_bitrate(global_prefs->wavpack_bitrate), &wavpack_percent);
 
 			write_playlist(playlist_wavpack)
 		}
-		if (global_prefs->rip_monkey){
-			if (aborted){
+		if (global_prefs->rip_monkey) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".ape");
 
-			monkey_enc(cursor->rip_name, file_name, int_to_monkey_int(global_prefs->monkey_compression), &monkey_percent);
+			monkey_enc(cursor->rip_name, file_name,
+					   int_to_monkey_int(global_prefs->monkey_compression), &monkey_percent);
 
 			write_playlist(playlist_monkey)
 		}
-		if (global_prefs->rip_musepack){
-			if (aborted){
+		if (global_prefs->rip_musepack) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".mpc");
 
-			musepack_enc(cursor->rip_name, file_name, int_to_musepack_int(global_prefs->musepack_bitrate), &musepack_percent);
+			musepack_enc(cursor->rip_name, file_name,
+						 int_to_musepack_int(global_prefs->musepack_bitrate), &musepack_percent);
 
 			write_playlist(playlist_musepack)
 		}
-		if (global_prefs->rip_aac){
-			if (aborted){
+		if (global_prefs->rip_aac) {
+			if (aborted) {
 				goto exit;
 			}
 
 			strcpy(ext_ptr, ".m4a");
 
-			aac_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title, album_meta->year, album_meta->genre, cursor->rip_name, file_name, global_prefs->aac_quality);
+			aac_enc(cursor->num_dst, cursor->artist, album_meta->title, cursor->title,
+					album_meta->year, album_meta->genre, cursor->rip_name, file_name,
+					global_prefs->aac_quality);
 
 			write_playlist(playlist_aac)
 		}
-		if (!global_prefs->rip_wav){
-			if (unlink(cursor->rip_name)){
-				debugLog("Unable to delete WAV file \"%s\": %s\n", cursor->rip_name, strerror(errno))
+		if (!global_prefs->rip_wav) {
+			if (unlink(cursor->rip_name)) {
+				debugLog("Unable to delete WAV file \"%s\": %s\n", cursor->rip_name,
+						 strerror(errno));
 			}
-		}
-		else{
+		} else {
 			write_playlist(playlist_wav)
 		}
 
-		mp3_percent			= 0.0;
-		ogg_percent			= 0.0;
-		flac_percent		= 0.0;
-		wavpack_percent		= 0.0;
-		monkey_percent		= 0.0;
-		musepack_percent	= 0.0;
+		mp3_percent = 0.0;
+		ogg_percent = 0.0;
+		flac_percent = 0.0;
+		wavpack_percent = 0.0;
+		monkey_percent = 0.0;
+		musepack_percent = 0.0;
 		encode_tracks_completed++;
 	}
 
 	/* wait until all the worker threads are done */
-	while (cdparanoia_pid != 0 || lame_pid != 0 || oggenc_pid != 0 ||
-		   opusenc_pid != 0 || flac_pid != 0 || wavpack_pid != 0 || monkey_pid != 0 ||
-		   musepack_pid != 0 || aac_pid != 0)
-	{
-		debugLog("w2")
+	while (cdparanoia_pid != 0 || lame_pid != 0 || oggenc_pid != 0 || opusenc_pid != 0 ||
+		   flac_pid != 0 || wavpack_pid != 0 || monkey_pid != 0 || musepack_pid != 0 ||
+		   aac_pid != 0) {
+		debugLog("w2");
 		usleep(100000);
 	}
 
@@ -697,29 +725,33 @@ static gpointer encode(gpointer data){
 	working = false;
 
 	gdk_threads_enter();
-		gtk_widget_hide(win_ripping);
-		gdk_flush();
+	gtk_widget_hide(win_ripping);
+	gdk_flush();
 
-		show_completed_dialog(numCdparanoiaOk + numLameOk + numOggOk + numOpusOk + numFlacOk + numWavpackOk + numMonkeyOk + numMusepackOk + numAacOk,
-							  numCdparanoiaFailed + numLameFailed + numOggFailed + numOpusFailed + numFlacFailed + numWavpackFailed + numMonkeyFailed + numMusepackFailed + numAacFailed);
+	show_completed_dialog(numCdparanoiaOk + numLameOk + numOggOk + numOpusOk + numFlacOk +
+							  numWavpackOk + numMonkeyOk + numMusepackOk + numAacOk,
+						  numCdparanoiaFailed + numLameFailed + numOggFailed + numOpusFailed +
+							  numFlacFailed + numWavpackFailed + numMonkeyFailed +
+							  numMusepackFailed + numAacFailed);
 	gdk_threads_leave();
 
-	exit:
+exit:
 
-	close_playlist(playlist_wav)
-	close_playlist(playlist_mp3)
-	close_playlist(playlist_ogg)
-	close_playlist(playlist_opus)
-	close_playlist(playlist_flac)
-	close_playlist(playlist_wavpack)
-	close_playlist(playlist_monkey)
-	close_playlist(playlist_musepack)
-	close_playlist(playlist_aac)
+	close_playlist(playlist_wav);
+	close_playlist(playlist_mp3);
+	close_playlist(playlist_ogg);
+	close_playlist(playlist_opus);
+	close_playlist(playlist_flac);
+	close_playlist(playlist_wavpack);
+	close_playlist(playlist_monkey);
+	close_playlist(playlist_musepack);
+	close_playlist(playlist_aac);
 
 	return NULL;
 }
 
-static gpointer track(gpointer data){
+static gpointer track(gpointer data)
+{
 	int parts = 1;
 	if (global_prefs->rip_mp3)
 		parts++;
@@ -739,22 +771,22 @@ static gpointer track(gpointer data){
 		parts++;
 
 	gdk_threads_enter();
-		GtkProgressBar * progress_total = GTK_PROGRESS_BAR(lookup_widget(win_ripping, "progress_total"));
-		GtkProgressBar * progress_rip = GTK_PROGRESS_BAR(lookup_widget(win_ripping, "progress_rip"));
-		GtkProgressBar * progress_encode = GTK_PROGRESS_BAR(lookup_widget(win_ripping, "progress_encode"));
+	GtkProgressBar *progress_total = GTK_PROGRESS_BAR(lookup_widget(win_ripping, "progress_total"));
+	GtkProgressBar *progress_rip = GTK_PROGRESS_BAR(lookup_widget(win_ripping, "progress_rip"));
+	GtkProgressBar *progress_encode =
+		GTK_PROGRESS_BAR(lookup_widget(win_ripping, "progress_encode"));
 
-		gtk_progress_bar_set_fraction(progress_total, 0.0);
-		gtk_progress_bar_set_text(progress_total, _("Waiting..."));
-		gtk_progress_bar_set_fraction(progress_rip, 0.0);
-		gtk_progress_bar_set_text(progress_rip, _("Waiting..."));
-		if (parts > 1)
-		{
-			gtk_progress_bar_set_fraction(progress_encode, 0.0);
-			gtk_progress_bar_set_text(progress_encode, _("Waiting..."));
-		} else {
-			gtk_progress_bar_set_fraction(progress_encode, 1.0);
-			gtk_progress_bar_set_text(progress_encode, "100% (0/0)");
-		}
+	gtk_progress_bar_set_fraction(progress_total, 0.0);
+	gtk_progress_bar_set_text(progress_total, _("Waiting..."));
+	gtk_progress_bar_set_fraction(progress_rip, 0.0);
+	gtk_progress_bar_set_text(progress_rip, _("Waiting..."));
+	if (parts > 1) {
+		gtk_progress_bar_set_fraction(progress_encode, 0.0);
+		gtk_progress_bar_set_text(progress_encode, _("Waiting..."));
+	} else {
+		gtk_progress_bar_set_fraction(progress_encode, 1.0);
+		gtk_progress_bar_set_text(progress_encode, "100% (0/0)");
+	}
 	gdk_threads_leave();
 
 	double prip;
@@ -765,59 +797,55 @@ static gpointer track(gpointer data){
 	char stotal[5];
 	char windowTitle[15]; /* "Asunder - 100%" */
 
-	while (!allDone)
-	{
-		if (aborted) g_thread_exit(NULL);
+	while (!allDone) {
+		if (aborted)
+			g_thread_exit(NULL);
 
-		prip = (rip_tracks_completed+rip_percent) / tracks_to_rip;
-		snprintf(srip, 13, "%d%% (%u/%u)", (int)(prip*100),
-				 (rip_tracks_completed < tracks_to_rip)
-					 ? (rip_tracks_completed + 1)
-					 : tracks_to_rip,
+		prip = (rip_tracks_completed + rip_percent) / tracks_to_rip;
+		snprintf(srip, 13, "%d%% (%u/%u)", (int)(prip * 100),
+				 (rip_tracks_completed < tracks_to_rip) ? (rip_tracks_completed + 1) :
+														  tracks_to_rip,
 				 tracks_to_rip);
-		if (parts > 1)
-		{
-			pencode = ((double)encode_tracks_completed/(double)tracks_to_rip) +
-					   ((mp3_percent+ogg_percent+flac_percent+wavpack_percent+monkey_percent
-						 +musepack_percent) /
-						(parts-1) / tracks_to_rip);
-			snprintf(sencode, 13, "%d%% (%u/%u)", (int)(pencode*100),
-					 (encode_tracks_completed < tracks_to_rip)
-						 ? (encode_tracks_completed + 1)
-						 : tracks_to_rip,
+		if (parts > 1) {
+			pencode = ((double)encode_tracks_completed / (double)tracks_to_rip) +
+					  ((mp3_percent + ogg_percent + flac_percent + wavpack_percent +
+						monkey_percent + musepack_percent) /
+					   (parts - 1) / tracks_to_rip);
+			snprintf(sencode, 13, "%d%% (%u/%u)", (int)(pencode * 100),
+					 (encode_tracks_completed < tracks_to_rip) ? (encode_tracks_completed + 1) :
+																 tracks_to_rip,
 					 tracks_to_rip);
-			ptotal = prip/parts + pencode*(parts-1)/parts;
-		}
-		else{
+			ptotal = prip / parts + pencode * (parts - 1) / parts;
+		} else {
 			ptotal = prip;
 		}
-		snprintf(stotal, 5, "%d%%", (int)(ptotal*100));
+		snprintf(stotal, 5, "%d%%", (int)(ptotal * 100));
 
 		strcpy(windowTitle, "Asunder - ");
 		strcat(windowTitle, stotal);
 
-		if (aborted) g_thread_exit(NULL);
+		if (aborted)
+			g_thread_exit(NULL);
 
 		gdk_threads_enter();
-			gtk_progress_bar_set_fraction(progress_rip, prip);
-			gtk_progress_bar_set_text(progress_rip, srip);
-			if (parts > 1)
-			{
-				gtk_progress_bar_set_fraction(progress_encode, pencode);
-				gtk_progress_bar_set_text(progress_encode, sencode);
-			}
+		gtk_progress_bar_set_fraction(progress_rip, prip);
+		gtk_progress_bar_set_text(progress_rip, srip);
+		if (parts > 1) {
+			gtk_progress_bar_set_fraction(progress_encode, pencode);
+			gtk_progress_bar_set_text(progress_encode, sencode);
+		}
 
-			gtk_progress_bar_set_fraction(progress_total, ptotal);
-			gtk_progress_bar_set_text(progress_total, stotal);
+		gtk_progress_bar_set_fraction(progress_total, ptotal);
+		gtk_progress_bar_set_text(progress_total, stotal);
 
-			gtk_window_set_title(GTK_WINDOW(win_main), windowTitle);
+		gtk_window_set_title(GTK_WINDOW(win_main), windowTitle);
 		gdk_threads_leave();
 
 		usleep(100000);
 	}
 
 	gdk_threads_enter();
-		gtk_window_set_title(GTK_WINDOW(win_main), "Asunder");
+	gtk_window_set_title(GTK_WINDOW(win_main), "Asunder");
 	gdk_threads_leave();
 
 	return NULL;

@@ -27,19 +27,37 @@ Foundation; version 2 of the licence.
 #include "threads.h"
 #include "util.h"
 
-gboolean for_each_row_deselect(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter1,
-							   gpointer data)
+void cell_data_func_tracknum(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
+							 GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data)
 {
-	gtk_list_store_set(GTK_LIST_STORE(model), iter1, COL_RIPTRACK, 0, -1);
+	int tracknum;
 
+	gtk_tree_model_get(tree_model, iter, COL_TRACKNUM, &tracknum, -1);
+	if (tracknum == -1) {
+		g_object_set(cell, "text", "", NULL);
+	} else {
+		char tracknum_str[16];
+
+		snprintf(tracknum_str, sizeof tracknum_str, "%d", tracknum);
+		g_object_set(cell, "text", &tracknum_str, NULL);
+	}
+}
+
+static gboolean for_each_row_deselect(GtkTreeModel *tree_model, GtkTreePath *path,
+									  GtkTreeIter *iter, gpointer data)
+{
+	gtk_list_store_set(GTK_LIST_STORE(tree_model), iter, COL_RIPTRACK, 0, COL_TRACKNUM, -1, -1);
 	return FALSE;
 }
 
-gboolean for_each_row_select(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
-							 gpointer data)
+static gboolean for_each_row_select(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter,
+									gpointer data)
 {
-	gtk_list_store_set(GTK_LIST_STORE(model), iter, COL_RIPTRACK, 1, -1);
+	int *tracknum_ptr = data;
 
+	gtk_list_store_set(GTK_LIST_STORE(tree_model), iter, COL_RIPTRACK, 1, COL_TRACKNUM,
+					   *tracknum_ptr, -1);
+	*tracknum_ptr += 1;
 	return FALSE;
 }
 
@@ -174,12 +192,21 @@ void on_cancel_clicked(GtkButton *button, gpointer user_data)
 	abort_threads();
 }
 
-void on_deselect_all_click(GtkMenuItem *menuitem, gpointer data)
+static void on_deselect_all_click(GtkMenuItem *menuitem, gpointer data)
 {
 	GtkTreeModel *model =
 		gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist")));
 
 	gtk_tree_model_foreach(model, for_each_row_deselect, NULL);
+}
+
+static void on_select_all_click(GtkMenuItem *menuitem, gpointer data)
+{
+	GtkTreeModel *model =
+		gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist")));
+	int tracknum = 1;
+
+	gtk_tree_model_foreach(model, for_each_row_select, &tracknum);
 }
 
 void on_vbr_toggled(GtkToggleButton *togglebutton, gpointer user_data)
@@ -499,29 +526,23 @@ void on_rip_toggled(GtkCellRendererToggle *cell, gchar *path_string, gpointer us
 		gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist"))));
 	GtkTreeIter iter;
 	int toggled;
-	int track_num;
+	int tracknum;
 	gboolean is_next;
 
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(store), &iter, path_string);
 	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, COL_RIPTRACK, &toggled, -1);
 	gtk_list_store_set(store, &iter, COL_RIPTRACK, !toggled, -1);
 
-	for (track_num = 1, is_next = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
+	for (tracknum = 1, is_next = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
 		 is_next; is_next = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter)) {
-		gtk_list_store_set(store, &iter, COL_TRACKNUM, track_num, -1);
 		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, COL_RIPTRACK, &toggled, -1);
 		if (toggled) {
-			track_num++;
+			gtk_list_store_set(store, &iter, COL_TRACKNUM, tracknum, -1);
+			tracknum++;
+		} else {
+			gtk_list_store_set(store, &iter, COL_TRACKNUM, -1, -1);
 		}
 	}
-}
-
-void on_select_all_click(GtkMenuItem *menuitem, gpointer data)
-{
-	GtkTreeModel *model =
-		gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist")));
-
-	gtk_tree_model_foreach(model, for_each_row_select, NULL);
 }
 
 void on_single_artist_toggled(GtkToggleButton *togglebutton, gpointer user_data)

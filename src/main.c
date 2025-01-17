@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
 												"active", COL_RIPTRACK, NULL);
 
 	renderer = gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tracklist), -1, _("Track"), renderer,
-												"text", COL_TRACKNUM, NULL);
+	gtk_tree_view_insert_column_with_data_func(GTK_TREE_VIEW(tracklist), -1, _("Track"), renderer,
+											   cell_data_func_tracknum, NULL, NULL);
 
 	renderer = gtk_cell_renderer_text_new();
 	g_object_set(renderer, "editable", TRUE, NULL);

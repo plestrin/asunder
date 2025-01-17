@@ -1,10 +1,7 @@
 #include <gtk/gtk.h>
 
-gboolean for_each_row_deselect(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
-							   gpointer data);
-
-gboolean for_each_row_select(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
-							 gpointer data);
+void cell_data_func_tracknum(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
+							 GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data);
 
 gchar *format_wavpack_bitrate(GtkScale *scale, gdouble arg1, gpointer user_data);
 
@@ -32,8 +29,6 @@ void on_artist_edited(GtkCellRendererText *cell, gchar *path_string, gchar *new_
 void on_browse_clicked(GtkButton *button, gpointer user_data);
 
 void on_cancel_clicked(GtkButton *button, gpointer user_data);
-
-void on_deselect_all_click(GtkMenuItem *menuitem, gpointer data);
 
 void on_matches_response(GtkDialog *dialog, gint response_id, gpointer user_data);
 void on_vbr_toggled(GtkToggleButton *togglebutton, gpointer user_data);
@@ -80,8 +75,6 @@ void on_rip_monkey_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 void on_rip_aac_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 void on_rip_musepack_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 void on_rip_toggled(GtkCellRendererToggle *cell, gchar *path_string, gpointer user_data);
-
-void on_select_all_click(GtkMenuItem *menuitem, gpointer data);
 
 void on_title_edited(GtkCellRendererText *cell, gchar *path_string, gchar *new_text,
 					 gpointer user_data);

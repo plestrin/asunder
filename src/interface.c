@@ -389,7 +389,7 @@ GtkWidget *create_prefs(void)
 	//~ gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
 
 	table1 = gtk_grid_new();
-	gtk_grid_set_column_spacing(table1, 5);
+	gtk_grid_set_column_spacing(GTK_GRID(table1), 5);
 	gtk_widget_show(table1);
 	gtk_box_pack_start(GTK_BOX(vbox), table1, TRUE, TRUE, 0);
 

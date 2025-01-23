@@ -785,7 +785,7 @@ void wavpack_enc(char *wavfilename, int compression, bool hybrid, int bitrate, d
         * line like this:
         * created 01 - Unknown Artist - Track 1.wv (+.wvc) in 50.22 secs (lossless, 73.91%)
         */
-		if (buf[strlen(buf) - 1] != ')' && sscanf(&buf[pos], "%d%%", &percent) == 1) {
+		if (strlen(buf) && buf[strlen(buf) - 1] != ')' && sscanf(&buf[pos], "%d%%", &percent) == 1) {
 			*progress = (double)percent / 100;
 			//!! This was commented out, possibly because the last line is in some
 			// different format than the normal progress

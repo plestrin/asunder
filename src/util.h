@@ -1,3 +1,6 @@
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <stdbool.h>
 #include <syslog.h>
 
@@ -8,9 +11,9 @@
 	if (global_prefs->do_log) {                    \
 		syslog(LOG_USER | LOG_DEBUG, __VA_ARGS__); \
 	}
-#define errorLog(...)                              \
-	if (global_prefs->do_log) {                    \
-		syslog(LOG_USER | LOG_ERROR, __VA_ARGS__); \
+#define errorLog(...)                            \
+	if (global_prefs->do_log) {                  \
+		syslog(LOG_USER | LOG_ERR, __VA_ARGS__); \
 	}
 
 void fatalError(const char *message) __attribute__((noreturn));
@@ -70,3 +73,5 @@ void trim_whitespace(char *str);
 // period (dot) because it screws up my file name database software. YMMV
 // 13may2013: removed '.' from the list, it's a valid character.
 #define BADCHARS "/?*|><:\"\\"
+
+#endif

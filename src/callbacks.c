@@ -43,6 +43,17 @@ void cell_data_func_tracknum(GtkTreeViewColumn *tree_column, GtkCellRenderer *ce
 	}
 }
 
+void cell_data_func_tracktime(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
+							  GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data)
+{
+	unsigned int tracktime;
+	char tracktime_str[6];
+
+	gtk_tree_model_get(tree_model, iter, COL_TRACKTIME, &tracktime, -1);
+	snprintf(tracktime_str, sizeof tracktime_str, "%02d:%02d", tracktime / 60, tracktime % 60);
+	g_object_set(cell, "text", &tracktime_str, NULL);
+}
+
 static gboolean for_each_row_deselect(GtkTreeModel *tree_model, GtkTreePath *path,
 									  GtkTreeIter *iter, gpointer data)
 {

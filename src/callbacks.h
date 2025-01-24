@@ -2,6 +2,8 @@
 
 void cell_data_func_tracknum(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
 							 GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data);
+void cell_data_func_tracktime(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
+							  GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data);
 
 gchar *format_wavpack_bitrate(GtkScale *scale, gdouble arg1, gpointer user_data);
 

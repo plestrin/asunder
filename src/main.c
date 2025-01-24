@@ -124,8 +124,8 @@ int main(int argc, char *argv[])
 												"text", COL_GENRE, NULL);
 
 	renderer = gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tracklist), -1, _("Time"), renderer,
-												"text", COL_TRACKTIME, NULL);
+	gtk_tree_view_insert_column_with_data_func(GTK_TREE_VIEW(tracklist), -1, _("Time"), renderer,
+											   cell_data_func_tracktime, NULL, NULL);
 
 	// set up the columns for the album selecting dropdown box
 	renderer = gtk_cell_renderer_text_new();
@@ -267,8 +267,7 @@ GtkTreeModel *create_model_from_disc(cddb_disc_t *disc)
 	GtkListStore *store;
 	GtkTreeIter iter;
 	cddb_track_t *track;
-	int seconds;
-	char time[6];
+	int track_time;
 	char year[5];
 	char *track_artist;
 	char *track_title;
@@ -277,15 +276,14 @@ GtkTreeModel *create_model_from_disc(cddb_disc_t *disc)
 							   G_TYPE_UINT, /* track number */
 							   G_TYPE_STRING, /* track artist */
 							   G_TYPE_STRING, /* track title */
-							   G_TYPE_STRING, /* track time */
 							   G_TYPE_STRING, /* genre */
+							   G_TYPE_UINT, /* track time */
 							   G_TYPE_STRING /* year */
 	);
 
 	for (track = cddb_disc_get_track_first(disc); track != NULL;
 		 track = cddb_disc_get_track_next(disc)) {
-		seconds = cddb_track_get_length(track);
-		snprintf(time, sizeof(time), "%02d:%02d", seconds / 60, seconds % 60);
+		track_time = cddb_track_get_length(track);
 
 		track_artist = (char *)cddb_track_get_artist(track);
 		trim_whitespace(track_artist);
@@ -298,7 +296,7 @@ GtkTreeModel *create_model_from_disc(cddb_disc_t *disc)
 		gtk_list_store_append(store, &iter);
 		gtk_list_store_set(store, &iter, COL_RIPTRACK, track_format[cddb_track_get_number(track)],
 						   COL_TRACKNUM, cddb_track_get_number(track), COL_TRACKARTIST,
-						   track_artist, COL_TRACKTITLE, track_title, COL_TRACKTIME, time,
+						   track_artist, COL_TRACKTITLE, track_title, COL_TRACKTIME, track_time,
 						   COL_GENRE, cddb_disc_get_genre(disc), COL_YEAR, year, -1);
 	}
 

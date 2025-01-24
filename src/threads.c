@@ -176,13 +176,10 @@ static struct trackMeta *trackMeta_create(const struct albumMeta *album_meta)
 	int track_num;
 	const char *track_artist;
 	const char *track_title;
-	const char *track_time;
 	struct trackMeta track_meta_local;
 	struct trackMeta *root;
 	struct trackMeta *current;
 	char *tmp;
-	unsigned int min;
-	unsigned int sec;
 
 	store = GTK_LIST_STORE(
 		gtk_tree_view_get_model(GTK_TREE_VIEW(lookup_widget(win_main, "tracklist"))));
@@ -192,7 +189,7 @@ static struct trackMeta *trackMeta_create(const struct albumMeta *album_meta)
 		 valid_row; valid_row = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter), i++) {
 		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, COL_RIPTRACK, &track_rip, COL_TRACKNUM,
 						   &track_num, COL_TRACKARTIST, &track_artist, COL_TRACKTITLE, &track_title,
-						   COL_TRACKTIME, &track_time, -1);
+						   COL_TRACKTIME, &track_meta_local.time, -1);
 
 		if (!track_rip) {
 			continue;
@@ -200,9 +197,6 @@ static struct trackMeta *trackMeta_create(const struct albumMeta *album_meta)
 
 		track_meta_local.num_src = i + 1;
 		track_meta_local.num_dst = track_num;
-
-		sscanf(track_time, "%u:%u", &min, &sec);
-		track_meta_local.time = sec + min * 60;
 
 		if (album_meta->single_artist) {
 			track_meta_local.artist = strdup(album_meta->artist);

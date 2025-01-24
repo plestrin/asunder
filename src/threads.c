@@ -122,18 +122,12 @@ struct trackMeta {
 
 static void trackMeta_clean(struct trackMeta *track_meta)
 {
-	if (track_meta->artist != NULL) {
-		free(track_meta->artist);
-		track_meta->artist = NULL;
-	}
-	if (track_meta->title != NULL) {
-		free(track_meta->title);
-		track_meta->title = NULL;
-	}
-	if (track_meta->rip_name != NULL) {
-		free(track_meta->rip_name);
-		track_meta->rip_name = NULL;
-	}
+	free(track_meta->artist);
+	track_meta->artist = NULL;
+	free(track_meta->title);
+	track_meta->title = NULL;
+	free(track_meta->rip_name);
+	track_meta->rip_name = NULL;
 	if (track_meta->next != NULL) {
 		trackMeta_delete(track_meta->next);
 		track_meta->next = NULL;
@@ -156,26 +150,16 @@ struct albumMeta {
 
 static void albumMeta_clean(struct albumMeta *album_meta)
 {
-	if (album_meta->artist != NULL) {
-		free(album_meta->artist);
-		album_meta->artist = NULL;
-	}
-	if (album_meta->title != NULL) {
-		free(album_meta->title);
-		album_meta->title = NULL;
-	}
-	if (album_meta->genre != NULL) {
-		free(album_meta->genre);
-		album_meta->genre = NULL;
-	}
-	if (album_meta->year != NULL) {
-		free(album_meta->year);
-		album_meta->year = NULL;
-	}
-	if (album_meta->directory != NULL) {
-		free(album_meta->directory);
-		album_meta->directory = NULL;
-	}
+	free(album_meta->artist);
+	album_meta->artist = NULL;
+	free(album_meta->title);
+	album_meta->title = NULL;
+	free(album_meta->genre);
+	album_meta->genre = NULL;
+	free(album_meta->year);
+	album_meta->year = NULL;
+	free(album_meta->directory);
+	album_meta->directory = NULL;
 	if (album_meta->track_meta != NULL) {
 		trackMeta_delete(album_meta->track_meta);
 		album_meta->track_meta = NULL;

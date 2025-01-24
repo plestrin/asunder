@@ -35,40 +35,20 @@ static struct prefs *new_prefs(void)
 
 static void clear_prefs(struct prefs *p)
 {
-	if (p->cdrom != NULL) {
-		free(p->cdrom);
-		p->cdrom = NULL;
-	}
-
-	if (p->music_dir != NULL) {
-		free(p->music_dir);
-		p->music_dir = NULL;
-	}
-
-	if (p->format_music != NULL) {
-		free(p->format_music);
-		p->format_music = NULL;
-	}
-
-	if (p->format_playlist != NULL) {
-		free(p->format_playlist);
-		p->format_playlist = NULL;
-	}
-
-	if (p->format_albumdir != NULL) {
-		free(p->format_albumdir);
-		p->format_albumdir = NULL;
-	}
-
-	if (p->server_name != NULL) {
-		free(p->server_name);
-		p->server_name = NULL;
-	}
-
-	if (p->cddb_server_name != NULL) {
-		free(p->cddb_server_name);
-		p->cddb_server_name = NULL;
-	}
+	free(p->cdrom);
+	p->cdrom = NULL;
+	free(p->music_dir);
+	p->music_dir = NULL;
+	free(p->format_music);
+	p->format_music = NULL;
+	free(p->format_playlist);
+	p->format_playlist = NULL;
+	free(p->format_albumdir);
+	p->format_albumdir = NULL;
+	free(p->server_name);
+	p->server_name = NULL;
+	free(p->cddb_server_name);
+	p->cddb_server_name = NULL;
 }
 
 void delete_prefs(struct prefs *p)
@@ -396,8 +376,7 @@ void load_prefs(struct prefs *p)
 
 #define update_if_not_zero(old_val, new_val) (tmp_int = (new_val), (tmp_int) ? tmp_int : (old_val))
 #define update_if_not_null(old_val, new_val) \
-	(tmp_str = (new_val),                    \
-	 (tmp_str != NULL) ? ((((old_val) != NULL) ? free(old_val), 0 : 0), tmp_str) : (old_val))
+	(tmp_str = (new_val), (tmp_str != NULL) ? (free(old_val), tmp_str) : (old_val))
 
 	if ((fd = open(file_name, O_RDONLY)) > -1) {
 		p->cdrom = update_if_not_null(p->cdrom, read_line(fd));

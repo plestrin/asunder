@@ -30,7 +30,7 @@ static unsigned int counter;
 /* ripping or encoding, so that can know not to clear the tracklist on eject */
 bool working;
 /* for canceling */
-bool aborted;
+static bool aborted;
 /* for stopping the tracking thread */
 static bool allDone;
 

@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 extern bool working;
-extern bool aborted;
 
 void abort_threads(void);
 

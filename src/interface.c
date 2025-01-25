@@ -1044,13 +1044,13 @@ GtkWidget *create_ripping(void)
 {
 	GtkWidget *ripping;
 	GtkWidget *dialog_vbox2;
-	GtkWidget *table3;
+	GtkWidget *grid;
 	GtkWidget *progress_total;
 	GtkWidget *progress_rip;
 	GtkWidget *progress_encode;
-	GtkWidget *label25;
-	GtkWidget *label26;
-	GtkWidget *label27;
+	GtkWidget *label_total;
+	GtkWidget *label_rip;
+	GtkWidget *label_encode;
 	GtkWidget *dialog_action_area2;
 	GtkWidget *cancel;
 
@@ -1063,42 +1063,41 @@ GtkWidget *create_ripping(void)
 	dialog_vbox2 = gtk_dialog_get_content_area(GTK_DIALOG(ripping));
 	gtk_widget_show(dialog_vbox2);
 
-	table3 = gtk_table_new(3, 2, FALSE);
-	gtk_widget_show(table3);
-	gtk_box_pack_start(GTK_BOX(dialog_vbox2), table3, TRUE, TRUE, 0);
+	grid = gtk_grid_new();
+	gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+	gtk_widget_set_margin_start(grid, 10);
+	gtk_widget_set_margin_end(grid, 10);
+	gtk_widget_set_margin_top(grid, 5);
+	gtk_widget_set_margin_bottom(grid, 10);
+	gtk_widget_show(grid);
+	gtk_box_pack_start(GTK_BOX(dialog_vbox2), grid, TRUE, TRUE, 0);
 
 	progress_total = gtk_progress_bar_new();
 	gtk_widget_show(progress_total);
-	gtk_table_attach(GTK_TABLE(table3), progress_total, 1, 2, 0, 1,
-					 (GtkAttachOptions)(GTK_EXPAND | GTK_FILL), (GtkAttachOptions)(0), 0, 0);
+	gtk_grid_attach(GTK_GRID(grid), progress_total, 1, 0, 1, 1);
 
 	progress_rip = gtk_progress_bar_new();
 	gtk_widget_show(progress_rip);
-	gtk_table_attach(GTK_TABLE(table3), progress_rip, 1, 2, 1, 2,
-					 (GtkAttachOptions)(GTK_EXPAND | GTK_FILL), (GtkAttachOptions)(0), 0, 0);
+	gtk_grid_attach(GTK_GRID(grid), progress_rip, 1, 1, 1, 1);
 
 	progress_encode = gtk_progress_bar_new();
 	gtk_widget_show(progress_encode);
-	gtk_table_attach(GTK_TABLE(table3), progress_encode, 1, 2, 2, 3,
-					 (GtkAttachOptions)(GTK_EXPAND | GTK_FILL), (GtkAttachOptions)(0), 0, 0);
+	gtk_grid_attach(GTK_GRID(grid), progress_encode, 1, 2, 1, 1);
 
-	label25 = gtk_label_new(_("Total progress"));
-	gtk_widget_show(label25);
-	gtk_table_attach(GTK_TABLE(table3), label25, 0, 1, 0, 1, (GtkAttachOptions)(GTK_FILL),
-					 (GtkAttachOptions)(0), 5, 0);
-	gtk_misc_set_alignment(GTK_MISC(label25), 0, 0.5);
+	label_total = gtk_label_new(_("Total progress"));
+	gtk_widget_set_halign(label_total, GTK_ALIGN_START);
+	gtk_widget_show(label_total);
+	gtk_grid_attach(GTK_GRID(grid), label_total, 0, 0, 1, 1);
 
-	label26 = gtk_label_new(_("Ripping"));
-	gtk_widget_show(label26);
-	gtk_table_attach(GTK_TABLE(table3), label26, 0, 1, 1, 2, (GtkAttachOptions)(GTK_FILL),
-					 (GtkAttachOptions)(0), 5, 0);
-	gtk_misc_set_alignment(GTK_MISC(label26), 0, 0.5);
+	label_rip = gtk_label_new(_("Ripping"));
+	gtk_widget_set_halign(label_rip, GTK_ALIGN_START);
+	gtk_widget_show(label_rip);
+	gtk_grid_attach(GTK_GRID(grid), label_rip, 0, 1, 1, 1);
 
-	label27 = gtk_label_new(_("Encoding"));
-	gtk_widget_show(label27);
-	gtk_table_attach(GTK_TABLE(table3), label27, 0, 1, 2, 3, (GtkAttachOptions)(GTK_FILL),
-					 (GtkAttachOptions)(0), 5, 0);
-	gtk_misc_set_alignment(GTK_MISC(label27), 0, 0.5);
+	label_encode = gtk_label_new(_("Encoding"));
+	gtk_widget_set_halign(label_encode, GTK_ALIGN_START);
+	gtk_widget_show(label_encode);
+	gtk_grid_attach(GTK_GRID(grid), label_encode, 0, 2, 1, 1);
 
 	dialog_action_area2 = gtk_dialog_get_action_area(GTK_DIALOG(ripping));
 	gtk_widget_show(dialog_action_area2);
@@ -1113,12 +1112,9 @@ GtkWidget *create_ripping(void)
 
 	/* Store pointers to all widgets, for use by lookup_widget(). */
 	GLADE_HOOKUP_OBJECT_NO_REF(ripping, ripping, "ripping");
-	GLADE_HOOKUP_OBJECT_NO_REF(ripping, dialog_vbox2, "dialog_vbox2");
-	GLADE_HOOKUP_OBJECT(ripping, table3, "table3");
 	GLADE_HOOKUP_OBJECT(ripping, progress_total, "progress_total");
 	GLADE_HOOKUP_OBJECT(ripping, progress_rip, "progress_rip");
 	GLADE_HOOKUP_OBJECT(ripping, progress_encode, "progress_encode");
-	GLADE_HOOKUP_OBJECT_NO_REF(ripping, dialog_action_area2, "dialog_action_area2");
 	GLADE_HOOKUP_OBJECT(ripping, cancel, "cancel");
 
 	return ripping;

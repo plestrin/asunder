@@ -198,9 +198,11 @@ void on_genre_edited(GtkCellRendererText *cell, gchar *path_string, gchar *new_t
 		gtk_list_store_set(store, &iter, COL_GENRE, new_text, -1);
 }
 
-void on_cancel_clicked(GtkButton *button, gpointer user_data)
+void dialog_ripping_response(GtkDialog *self, gint response_id, gpointer user_data)
 {
-	abort_threads();
+	if (response_id == GTK_RESPONSE_CANCEL) {
+		abort_threads();
+	}
 }
 
 static void on_deselect_all_click(GtkMenuItem *menuitem, gpointer data)

@@ -30,7 +30,7 @@ void on_artist_edited(GtkCellRendererText *cell, gchar *path_string, gchar *new_
 
 void on_browse_clicked(GtkButton *button, gpointer user_data);
 
-void on_cancel_clicked(GtkButton *button, gpointer user_data);
+void dialog_ripping_response(GtkDialog *self, gint response_id, gpointer user_data);
 
 void on_matches_response(GtkDialog *dialog, gint response_id, gpointer user_data);
 void on_vbr_toggled(GtkToggleButton *togglebutton, gpointer user_data);

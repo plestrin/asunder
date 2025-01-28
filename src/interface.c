@@ -1042,8 +1042,8 @@ GtkWidget *create_prefs(void)
 
 GtkWidget *create_ripping(void)
 {
-	GtkWidget *ripping;
-	GtkWidget *dialog_vbox2;
+	GtkWidget *dialog_ripping;
+	GtkWidget *dialog_ripping_content;
 	GtkWidget *grid;
 	GtkWidget *progress_total;
 	GtkWidget *progress_rip;
@@ -1051,17 +1051,15 @@ GtkWidget *create_ripping(void)
 	GtkWidget *label_total;
 	GtkWidget *label_rip;
 	GtkWidget *label_encode;
-	GtkWidget *dialog_action_area2;
-	GtkWidget *cancel;
 
-	ripping = gtk_dialog_new();
-	gtk_window_set_transient_for(GTK_WINDOW(ripping), GTK_WINDOW(win_main));
-	gtk_window_set_title(GTK_WINDOW(ripping), _("Ripping"));
-	gtk_window_set_modal(GTK_WINDOW(ripping), TRUE);
-	gtk_window_set_type_hint(GTK_WINDOW(ripping), GDK_WINDOW_TYPE_HINT_DIALOG);
+	dialog_ripping = gtk_dialog_new();
+	gtk_window_set_transient_for(GTK_WINDOW(dialog_ripping), GTK_WINDOW(win_main));
+	gtk_window_set_title(GTK_WINDOW(dialog_ripping), _("Ripping"));
+	gtk_window_set_modal(GTK_WINDOW(dialog_ripping), TRUE);
+	gtk_window_set_type_hint(GTK_WINDOW(dialog_ripping), GDK_WINDOW_TYPE_HINT_DIALOG);
 
-	dialog_vbox2 = gtk_dialog_get_content_area(GTK_DIALOG(ripping));
-	gtk_widget_show(dialog_vbox2);
+	dialog_ripping_content = gtk_dialog_get_content_area(GTK_DIALOG(dialog_ripping));
+	gtk_widget_show(dialog_ripping_content);
 
 	grid = gtk_grid_new();
 	gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
@@ -1070,7 +1068,7 @@ GtkWidget *create_ripping(void)
 	gtk_widget_set_margin_top(grid, 5);
 	gtk_widget_set_margin_bottom(grid, 10);
 	gtk_widget_show(grid);
-	gtk_box_pack_start(GTK_BOX(dialog_vbox2), grid, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog_ripping_content), grid, TRUE, TRUE, 0);
 
 	progress_total = gtk_progress_bar_new();
 	gtk_widget_show(progress_total);
@@ -1099,25 +1097,17 @@ GtkWidget *create_ripping(void)
 	gtk_widget_show(label_encode);
 	gtk_grid_attach(GTK_GRID(grid), label_encode, 0, 2, 1, 1);
 
-	dialog_action_area2 = gtk_dialog_get_action_area(GTK_DIALOG(ripping));
-	gtk_widget_show(dialog_action_area2);
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(dialog_action_area2), GTK_BUTTONBOX_END);
-
-	cancel = gtk_button_new_from_stock("gtk-cancel");
-	gtk_widget_show(cancel);
-	gtk_dialog_add_action_widget(GTK_DIALOG(ripping), cancel, GTK_RESPONSE_CANCEL);
-	gtk_widget_set_can_default(cancel, TRUE);
-
-	g_signal_connect((gpointer)cancel, "clicked", G_CALLBACK(on_cancel_clicked), NULL);
+	gtk_dialog_add_button(GTK_DIALOG(dialog_ripping), "Cancel", GTK_RESPONSE_CANCEL);
+	g_signal_connect((gpointer)dialog_ripping, "response", G_CALLBACK(dialog_ripping_response),
+					 NULL);
 
 	/* Store pointers to all widgets, for use by lookup_widget(). */
-	GLADE_HOOKUP_OBJECT_NO_REF(ripping, ripping, "ripping");
-	GLADE_HOOKUP_OBJECT(ripping, progress_total, "progress_total");
-	GLADE_HOOKUP_OBJECT(ripping, progress_rip, "progress_rip");
-	GLADE_HOOKUP_OBJECT(ripping, progress_encode, "progress_encode");
-	GLADE_HOOKUP_OBJECT(ripping, cancel, "cancel");
+	GLADE_HOOKUP_OBJECT_NO_REF(dialog_ripping, dialog_ripping, "ripping");
+	GLADE_HOOKUP_OBJECT(dialog_ripping, progress_total, "progress_total");
+	GLADE_HOOKUP_OBJECT(dialog_ripping, progress_rip, "progress_rip");
+	GLADE_HOOKUP_OBJECT(dialog_ripping, progress_encode, "progress_encode");
 
-	return ripping;
+	return dialog_ripping;
 }
 
 void disable_all_main_widgets(void)

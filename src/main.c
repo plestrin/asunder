@@ -268,7 +268,6 @@ GtkTreeModel *create_model_from_disc(cddb_disc_t *disc)
 	GtkTreeIter iter;
 	cddb_track_t *track;
 	int track_time;
-	char year[5];
 	char *track_artist;
 	char *track_title;
 
@@ -277,8 +276,7 @@ GtkTreeModel *create_model_from_disc(cddb_disc_t *disc)
 							   G_TYPE_STRING, /* track artist */
 							   G_TYPE_STRING, /* track title */
 							   G_TYPE_STRING, /* genre */
-							   G_TYPE_UINT, /* track time */
-							   G_TYPE_STRING /* year */
+							   G_TYPE_UINT /* track time */
 	);
 
 	for (track = cddb_disc_get_track_first(disc); track != NULL;
@@ -291,13 +289,11 @@ GtkTreeModel *create_model_from_disc(cddb_disc_t *disc)
 		track_title = (char *)cddb_track_get_title(track); //!! this returns const char*
 		trim_whitespace(track_title);
 
-		snprintf(year, sizeof(year), "%d", cddb_disc_get_year(disc));
-
 		gtk_list_store_append(store, &iter);
 		gtk_list_store_set(store, &iter, COL_RIPTRACK, track_format[cddb_track_get_number(track)],
 						   COL_TRACKNUM, cddb_track_get_number(track), COL_TRACKARTIST,
 						   track_artist, COL_TRACKTITLE, track_title, COL_TRACKTIME, track_time,
-						   COL_GENRE, cddb_disc_get_genre(disc), COL_YEAR, year, -1);
+						   COL_GENRE, cddb_disc_get_genre(disc), -1);
 	}
 
 	return GTK_TREE_MODEL(store);
